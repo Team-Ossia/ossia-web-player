@@ -15,7 +15,6 @@ export type Song = {
 }
 
 export const querySongs = async (query: string) => {
-    console.log(process.env.LASTFM_API_KEY)
     // search for a song based on artist name and song name
     const response = await fetch(`${apiRoot}?method=track.search&track=${query}&api_key=${apiKey}&format=json`);
     const data = await response.json();

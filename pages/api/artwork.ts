@@ -51,11 +51,11 @@ export default async function handler(
         const responseJson = await response.json();
         const track = responseJson.tracks.items[0];
 
-        let image
+        let image: string
 
         if (!track) {
-            throw new Error('No track found');            
-        }else{
+            throw new Error('No track found');
+        } else {
             image = track.album.images[0]?.url;
         }
 
@@ -71,12 +71,15 @@ export default async function handler(
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         res.setHeader('Access-Control-Max-Age', '86400');
 
-        // Download image and return it
-        https.get(image, (response) => {
-            response.pipe(res);
+        // Download image with https.get and pipe it to the response, awaiting the result
+        await new Promise((resolve, reject) => {
+            https.get(image, (response) => {
+                response.pipe(res);
+                response.on('end', resolve);
+                response.on('error', reject);
+            });
         });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }

@@ -50,15 +50,13 @@ const pages: {
 const PhoneNavbar = () => {
   const [value, setValue] = useState(0);
   const router = useRouter();
-  return (<><div style={{ height: '4rem' }} /><BottomNavigation
+  return (<><BottomNavigation
     sx={{
-      position: 'fixed',
-      bottom: 0,
       width: '100%',
+      minHeight: '3rem',
     }}
     value={value}
     onChange={(event, newValue) => {
-      console.log(newValue);
       setValue(newValue);
     }}
   >
@@ -80,12 +78,25 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container style={{
-        paddingTop: '1rem',
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        gap: 0,
+        justifyContent: 'space-between',
       }}>
-        <Component {...pageProps} />
-      </Container>
-      <PhoneNavbar />
+        <div style={{
+          overflowY: 'auto',
+          flexShrink: 1,
+        }}>
+          <Container sx={{
+            marginBottom: '1rem',
+          }}>
+            <Component {...pageProps} />
+          </Container>
+        </div>
+        <PhoneNavbar />
+      </div>
     </ThemeProvider>
   )
 }

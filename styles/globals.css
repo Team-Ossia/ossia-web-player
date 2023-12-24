@@ -26,6 +26,7 @@ html {
 body {
   margin: 0;
   padding: 0;
+  max-height: 100vh;
   overflow-x: hidden;
   font-family: 'Raleway', sans-serif;
   color-scheme: dark;

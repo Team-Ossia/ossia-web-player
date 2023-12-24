@@ -3,11 +3,34 @@ import { MusicNote, Search } from '@mui/icons-material';
 import { Box, Button, Divider, FormControl, IconButton, TextField, Typography, useTheme } from '@mui/material';
 import type { NextPage } from 'next';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useMemo, useState } from 'react';
 
 const Home: NextPage = () => {
   const theme = useTheme()
   const [searchResults, setSearchResults] = useState<Song[] | null>(null)
+  const [formTimeout, setFormTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [query, setQuery] = useState<string>("")
+  const router = useRouter()
+
+  const search = () => {
+    if (query.length < 1) {
+      setSearchResults(null)
+      return
+    }
+    lastFm.querySongs(query).then((songs) => {
+      if (songs.results) {
+        setSearchResults(songs.results.trackmatches.track)
+      } else {
+        setSearchResults(null)
+      }
+    })
+  }
+
+  useEffect(() => {
+    if (formTimeout) clearTimeout(formTimeout)
+    setFormTimeout(setTimeout(search, 500))
+  }, [query])
 
   return <div>
     <Box sx={{
@@ -40,33 +63,33 @@ const Home: NextPage = () => {
         <Typography variant="h2">Just listen.</Typography>
       </div>
     </Box>
-    <form onSubmit={(e) => {
+    <iframe name="hidden" style={{ display: 'none' }} />
+    <form action="#" target='hidden' onSubmit={(e) => {
       e.preventDefault()
-      const query = ((e.target as any)[0] as HTMLInputElement).value
-      lastFm.querySongs(query).then((songs) => {
-        if (songs.results) {
-          setSearchResults(songs.results.trackmatches.track)
-        } else {
-          setSearchResults(null)
-        }
-      })
+      search()
+      return false
     }}>
-      <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-        <TextField autoComplete='off' name='query' type='text' fullWidth size='medium' style={{ width: '100%' }} label="Search" variant="standard" />
-        <IconButton type='submit'>
-          <Search />
-        </IconButton>
-      </Box>
+      <TextField value={query} onChange={(e) => {
+        setQuery(e.target.value)
+        if (e.target.value.length < 1) {
+          setSearchResults(null)
+          return
+        }
+      }} autoComplete='off' name='query' type='text' fullWidth size='medium' style={{ width: '100%' }} label="Search" variant="standard" />
     </form>
-    <Divider sx={{ margin: '2rem 0' }} />
+    <Divider sx={{ margin: '1rem 0' }} />
     <Box sx={{
       display: 'flex',
       flexDirection: 'column',
       gap: '.5rem',
     }}>
       {searchResults && searchResults.map((song, i) => {
-        return (<Box key={i} sx={{
+        return (<Box onClick={()=>{
+          router.push(`/play?artist=${song.artist}&title=${song.name}`)
+        }} component="button" key={`${song.url}`} sx={{
           display: 'flex',
+          backgroundColor: "transparent",
+          textAlign: 'left',
           alignItems: 'center',
           position: 'relative',
           gap: '1rem',
@@ -93,14 +116,15 @@ const Home: NextPage = () => {
           '&:hover:before': {
             width: 'calc(100% - 3.8rem)',
           },
-          '&:active:before': {
+          '&:focus:before': {
             width: '100%',
           },
           '&:hover': {
             cursor: 'pointer',
           },
-          '&:active': {
+          '&:focus': {
             borderColor: theme.palette.primary.main,
+            outline: 'none',
             padding: '0.4rem',
           }
         }}>
