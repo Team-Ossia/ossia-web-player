@@ -9,6 +9,8 @@ import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MusicPlayer, useMusicPlayer } from '@/components/musicPlayer';
 import { Wave } from '@/components/wave';
+import { dvh, lvh, svh } from '@/components/units';
+import { useIsMobile } from '@/components/isMobile';
 
 export const MusicPlayerContext = createContext<MusicPlayer>(null as any);
 
@@ -84,6 +86,7 @@ const pages: {
 const PhoneNavbar = () => {
   const [value, setValue] = useState<number>(-1);
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const path = router.pathname;
@@ -102,6 +105,12 @@ const PhoneNavbar = () => {
         zIndex: 100,
         minHeight: 'var(--bottom-nav-height)',
         boxShadow: `0 5px ${defaultShadow[2]} ${defaultShadow[3]}`,
+        ...(isMobile ? {
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+        } : {})
       }}
       value={value}
       onChange={(event, newValue) => {
@@ -273,6 +282,7 @@ export const ArtworkWaves = () => {
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const musicPlayer = useMusicPlayer()
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -323,7 +333,7 @@ export default function App({ Component, pageProps }: AppProps) {
           bottom: 0,
           left: 0,
           width: '100vw',
-          height: '100vh',
+          height: "100vh",
           zIndex: -1,
           opacity: 0.1,
           filter: 'blur(10px)',
@@ -337,7 +347,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          height: '100vh',
+          height: dvh(100),
           gap: 0,
           justifyContent: 'space-between',
         }}>
@@ -373,7 +383,11 @@ export default function App({ Component, pageProps }: AppProps) {
                   style={{ overflow: 'hidden' }}
                   transition={{ duration: .3 }}
                   initial={{ translateX: '100%' }}
-                  animate={{ translateX: '0%', paddingBottom: (musicPlayer.currentSong && !router.pathname.startsWith("/player")) ? 'calc(var(--bottom-nav-height) * 1.5)' : '0' }}
+                  animate={{
+                    translateX: '0%',
+                    paddingBottom: (musicPlayer.currentSong && !router.pathname.startsWith("/player")) ? 'calc(var(--bottom-nav-height) * 1.5)' : '0',
+                    marginBottom: isMobile ? 'calc(var(--bottom-nav-height) + 1rem)' : '0',
+                  }}
                   exit={{ translateX: '-100%' }}
                 >
                   <Component {...pageProps} />

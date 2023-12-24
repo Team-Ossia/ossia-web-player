@@ -137,9 +137,27 @@ const Home: NextPage = () => {
           <img style={{
             backgroundColor: theme.palette.common.white,
             borderRadius: '0.4rem',
+            width: 64,
+            height: 64,
+            minWidth: 64,
           }} alt={song.name} src={`/api/artwork?artist=${song.artist}&title=${song.name}`} width={64} height={64} />
-          <div>
-            <Typography variant="h5">{song.name}</Typography>
+          <div style={{
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            gap: '.2rem',
+            flexShrink: 1,
+          }}>
+            <Typography style={{
+              // line clamp 2
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }} variant="h5">{song.name}</Typography>
             <Typography variant="subtitle1">{song.artist}</Typography>
           </div>
         </Box>)

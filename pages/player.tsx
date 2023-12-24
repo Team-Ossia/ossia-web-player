@@ -5,6 +5,7 @@ import { createElement, useContext, useEffect } from "react";
 import { MusicPlayerContext, defaultShadow } from "./_app";
 import { useIsMobile } from "@/components/isMobile";
 import { useRouter } from "next/router";
+import { dvh } from "@/components/units";
 
 export const VolumeThumbComponent = (props: any) => {
     const { children, ...other } = props;
@@ -30,7 +31,7 @@ const Player: NextPage = () => {
 
     return (<>
         <Box sx={{
-            minHeight: 'calc(100vh - var(--bottom-nav-height) - var(--bottom-nav-space))',
+            minHeight: `calc(${dvh(100)} - var(--bottom-nav-height) - var(--bottom-nav-space))`,
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
