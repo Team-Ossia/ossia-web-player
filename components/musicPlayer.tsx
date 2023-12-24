@@ -89,22 +89,17 @@ export const useMusicPlayer = () => {
         const onAudioLoaded = () => {
             audio.play();
         }
-        const onLoadStart = () => {
-            audio.pause();
-        }
         audio.addEventListener("play", onAudioStart);
         audio.addEventListener("pause", onAudioPause);
         audio.addEventListener("ended", onAudioEnd);
         audio.addEventListener("error", onAudioError);
         audio.addEventListener("loadeddata", onAudioLoaded);
-        audio.addEventListener("loadstart", onLoadStart);
         return () => {
             audio.removeEventListener("play", onAudioStart);
             audio.removeEventListener("pause", onAudioPause);
             audio.removeEventListener("ended", onAudioEnd);
             audio.removeEventListener("error", onAudioError);
             audio.removeEventListener("loadeddata", onAudioLoaded);
-            audio.removeEventListener("loadstart", onLoadStart);
         }
     }, [audio])
 

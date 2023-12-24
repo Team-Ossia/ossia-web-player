@@ -46,26 +46,43 @@ const pages: {
   icon: IconComponent
   label: string,
   href: string,
+  extraAction?: any,
 }[] = [
     {
       icon: Search,
       label: 'Home',
-      href: '/'
+      href: '/',
+      extraAction: () => {
+        const pagePath = window.location.pathname
+        if (pagePath === '/') {
+          const input = document.getElementById('search-input')
+          if (input) {
+            input.focus()
+          }
+          return
+        }
+        setTimeout(() => {
+          const input = document.getElementById('search-input')
+          if (input) {
+            input.focus()
+          }
+        }, 650)
+      }
     },
-    {
-      icon: Album,
-      label: 'Player',
-      href: '/player'
-    },
-    {
-      icon: Settings,
-      label: 'Settings',
-      href: '/settings'
-    }
+    // {
+    //   icon: Album,
+    //   label: 'Player',
+    //   href: '/player'
+    // },
+    // {
+    //   icon: Settings,
+    //   label: 'Settings',
+    //   href: '/settings'
+    // }
   ]
 
 const PhoneNavbar = () => {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState<number>(-1);
   const router = useRouter();
 
   useEffect(() => {
@@ -73,8 +90,10 @@ const PhoneNavbar = () => {
     const index = pages.findIndex((page) => page.href === path);
     if (index > -1) {
       setValue(index);
+    } else {
+      setValue(-1)
     }
-  }, [value, router.pathname])
+  }, [value, router])
 
   return (<>
     <BottomNavigation
@@ -95,6 +114,9 @@ const PhoneNavbar = () => {
       }} href={page.href} onClick={(e) => {
         e.preventDefault()
         router.push(page.href);
+        if (page.extraAction) {
+          page.extraAction()
+        }
       }} key={index} label="" icon={createElement(page.icon, { fontSize: "medium" })} />)}
     </BottomNavigation></>)
 }
@@ -279,18 +301,6 @@ export default function App({ Component, pageProps }: AppProps) {
       if (e.key === ' ' && document.activeElement?.tagName !== 'INPUT') {
         e.preventDefault()
         musicPlayer.playing ? musicPlayer.pause() : musicPlayer.play(musicPlayer.currentSong || musicPlayer.queue[0])
-      }
-
-      // NEXT
-      if (e.key === 'ArrowRight') {
-        e.preventDefault()
-        musicPlayer.next()
-      }
-
-      // PREVIOUS
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault()
-        musicPlayer.previous()
       }
     }
     window.addEventListener('keydown', hotkeyHandler)

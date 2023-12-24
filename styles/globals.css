@@ -35,6 +35,34 @@
   }
 }
 
+@font-face {
+  font-family: 'Horizon';
+  src: url('/fonts/Horizon/Horizon-bold-italic.ttf');
+  font-weight: bold;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Horizon';
+  src: url('/fonts/Horizon/Horizon-bold.ttf');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Horizon';
+  src: url('/fonts/Horizon/Horizon-regular-italic.ttf');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Horizon';
+  src: url('/fonts/Horizon/Horizon-regular.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
 * {
   box-sizing: border-box;
   user-select: none;

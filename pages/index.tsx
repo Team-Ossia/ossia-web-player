@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { MusicPlayerContext } from './_app';
+import { useIsMobile } from '@/components/isMobile';
 
 const Home: NextPage = () => {
   const theme = useTheme()
@@ -13,6 +14,7 @@ const Home: NextPage = () => {
   const [formTimeout, setFormTimeout] = useState<NodeJS.Timeout | null>(null)
   const [query, setQuery] = useState<string>("")
   const player = useContext(MusicPlayerContext)
+  const isMobile = useIsMobile()
 
   const search = () => {
     if (query.length < 1) {
@@ -36,7 +38,7 @@ const Home: NextPage = () => {
   return <div>
     <Box sx={{
       display: 'flex',
-      flexDirection: 'row',
+      flexDirection: 'column',
       textAlign: 'left',
       flexWrap: 'wrap',
       gap: '0 2rem',
@@ -51,21 +53,14 @@ const Home: NextPage = () => {
         }
       }
     }}>
-      <img alt='Ossia Logo' src='/ossia_logo.png' style={{
-        width: '10rem',
-        filter: 'invert(1)',
-        height: '10rem',
-        minWidth: '10rem',
+      <img alt='Ossia Logo' src='/ossia_hero_white.png' style={{
+        width: '25rem',
+        height: 'auto',
+        maxWidth: 'calc(100% - 6rem)',
+        // minWidth: '20rem',
         borderRadius: '0.4rem',
-        boxShadow: `${theme.shadows[0]} ${theme.shadows[1]} ${theme.shadows[2]} rgba(0,0,0,.4)`,
+        filter: `drop-shadow(${theme.shadows[0]} ${theme.shadows[1]} ${theme.shadows[2]} rgba(0,0,0,.4))`,
       }} />
-      <div style={{
-        textWrap: 'nowrap',
-        whiteSpace: 'nowrap',
-      }}>
-        <Typography color={theme.palette.primary.main} variant="h1">Ossia</Typography>
-        <Typography variant="h2">Just listen.</Typography>
-      </div>
     </Box>
     <iframe name="hidden" style={{ display: 'none' }} />
     <form action="#" target='hidden' onSubmit={(e) => {
@@ -73,7 +68,7 @@ const Home: NextPage = () => {
       search()
       return false
     }}>
-      <TextField sx={{
+      <TextField id='search-input' sx={{
         '& label': {
           transition: 'all .2s ease-in-out',
         },

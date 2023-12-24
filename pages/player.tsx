@@ -1,9 +1,10 @@
 import { Pause, PlayArrow, SkipNext, SkipPrevious, VolumeDown, VolumeMute, VolumeUp } from "@mui/icons-material";
 import { Box, Button, ButtonGroup, IconButton, Slider, SliderThumb, Typography } from "@mui/material";
 import type { NextPage } from "next";
-import { createElement, useContext } from "react";
+import { createElement, useContext, useEffect } from "react";
 import { MusicPlayerContext, defaultShadow } from "./_app";
 import { useIsMobile } from "@/components/isMobile";
+import { useRouter } from "next/router";
 
 export const VolumeThumbComponent = (props: any) => {
     const { children, ...other } = props;
@@ -21,6 +22,11 @@ export const VolumeThumbComponent = (props: any) => {
 const Player: NextPage = () => {
     const player = useContext(MusicPlayerContext);
     const isMobile = useIsMobile()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!player.currentSong) router.push("/")
+    }, [player, router])
 
     return (<>
         <Box sx={{
