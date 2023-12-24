@@ -2,6 +2,12 @@
     "name": "Ossia Music Player",
     "short_name": "Ossia",
     "description": "A music player for the web",
+    "categories": [
+        "music",
+        "entertainment"
+    ],
+    "iarc_rating_id": null,
+    "author": "Team Ossia",
     "icons": [
         {
             "src": "/pwa-assets/manifest-icon-192.maskable.png",
@@ -64,7 +70,16 @@
     ],
     "start_url": "/",
     "id": "com.ossia.musicplayer",
+    "prefer_related_applications": false,
+    "display_override": [
+        "fullscreen",
+        "minimal-ui"
+    ],
+    "lang": "en-US",
+    "dir": "ltr",
+    "splash_pages": null,
     "display": "standalone",
+    "orientation": "portrait",
     "theme_color": "#8B00FF",
     "background_color": "#121212"
 }
