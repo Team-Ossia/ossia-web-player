@@ -327,7 +327,7 @@ export default function App({ Component, pageProps }: AppProps) {
           zIndex: -1,
           opacity: 0.1,
           filter: 'blur(10px)',
-          backgroundImage: `url(/api/artwork?artist=${encodeURIComponent(musicPlayer.currentSong?.artist)}&title=${encodeURIComponent(musicPlayer.currentSong?.name)})`,
+          backgroundImage: `url("/api/artwork?artist=${encodeURIComponent(musicPlayer.currentSong?.artist)}&title=${encodeURIComponent(musicPlayer.currentSong?.name)}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }} /></motion.div>}
