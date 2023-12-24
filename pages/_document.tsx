@@ -47,7 +47,7 @@ export default function Document() {
       <Head>
         <meta name="theme-color" content="#8B00FF" />
         <link rel="icon" href="/ossia_logo.png" />
-        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="manifest" href="/manifest.json" />
       </Head>
       <body>
         <title>Ossia Music</title>

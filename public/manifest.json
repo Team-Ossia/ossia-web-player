@@ -1,0 +1,70 @@
+{
+    "name": "Ossia Music Player",
+    "short_name": "Ossia",
+    "description": "A music player for the web",
+    "icons": [
+        {
+            "src": "/pwa-assets/manifest-icon-192.maskable.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/pwa-assets/manifest-icon-192.maskable.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/pwa-assets/manifest-icon-512.maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/pwa-assets/manifest-icon-512.maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshots/mobile_1.png",
+            "sizes": "1170x2532",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "platform": "ios",
+            "label": "Searching for songs"
+        },
+        {
+            "src": "/screenshots/mobile_2.png",
+            "sizes": "1170x2532",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "platform": "ios",
+            "label": "Player screen"
+        },
+        {
+            "src": "/screenshots/desktop_1.png",
+            "sizes": "3840x2160",
+            "type": "image/png",
+            "form_factor": "wide",
+            "platform": "windows",
+            "label": "Searching for songs"
+        },
+        {
+            "src": "/screenshots/desktop_2.png",
+            "sizes": "3840x2160",
+            "type": "image/png",
+            "form_factor": "wide",
+            "platform": "windows",
+            "label": "Player screen"
+        }
+    ],
+    "start_url": "/",
+    "id": "com.ossia.musicplayer",
+    "display": "standalone",
+    "theme_color": "#8B00FF",
+    "background_color": "#121212"
+}
