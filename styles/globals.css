@@ -14,9 +14,35 @@
   }
 }
 
+@keyframes wave {
+  0% {
+    margin-left: 0;
+  }
+
+  100% {
+    margin-left: -1600px;
+  }
+}
+
+@keyframes swell {
+  0%,
+  100% {
+    transform: translate3d(0, -25px, 0);
+  }
+
+  50% {
+    transform: translate3d(0, 5px, 0);
+  }
+}
+
 * {
   box-sizing: border-box;
   user-select: none;
+}
+
+:root {
+  --bottom-nav-height: 56px;
+  --bottom-nav-space: 2rem;
 }
 
 html {
@@ -45,7 +71,6 @@ img::before {
   width: 100%;
   height: 100%;
   background-color: #ccc;
-  border-radius: 10px;
   position: absolute;
   top: 0;
   left: 0;
@@ -60,5 +85,5 @@ img::after {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);  
+  transform: translate(-50%, -50%);
 }

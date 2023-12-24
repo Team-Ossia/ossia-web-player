@@ -4,14 +4,15 @@ import { Box, Button, Divider, FormControl, IconButton, TextField, Typography, u
 import type { NextPage } from 'next';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { MusicPlayerContext } from './_app';
 
 const Home: NextPage = () => {
   const theme = useTheme()
   const [searchResults, setSearchResults] = useState<Song[] | null>(null)
   const [formTimeout, setFormTimeout] = useState<NodeJS.Timeout | null>(null)
   const [query, setQuery] = useState<string>("")
-  const router = useRouter()
+  const player = useContext(MusicPlayerContext)
 
   const search = () => {
     if (query.length < 1) {
@@ -69,7 +70,14 @@ const Home: NextPage = () => {
       search()
       return false
     }}>
-      <TextField value={query} onChange={(e) => {
+      <TextField sx={{
+        '& label': {
+          transition: 'all .2s ease-in-out',
+        },
+        '& label[data-shrink="true"]': {
+          opacity: 0,
+        }
+      }} value={query} onChange={(e) => {
         setQuery(e.target.value)
         if (e.target.value.length < 1) {
           setSearchResults(null)
@@ -84,8 +92,8 @@ const Home: NextPage = () => {
       gap: '.5rem',
     }}>
       {searchResults && searchResults.map((song, i) => {
-        return (<Box onClick={()=>{
-          router.push(`/play?artist=${song.artist}&title=${song.name}`)
+        return (<Box onClick={() => {
+          player.play(song)
         }} component="button" key={`${song.url}`} sx={{
           display: 'flex',
           backgroundColor: "transparent",
