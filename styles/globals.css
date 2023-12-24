@@ -43,6 +43,7 @@
 :root {
   --bottom-nav-height: 56px;
   --bottom-nav-space: 2rem;
+  --now-playing-widget-height: calc(var(--bottom-nav-height) * 1.2);
 }
 
 html {
@@ -86,4 +87,8 @@ img::after {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.css-jymg5i-MuiSlider-root {
+  padding: 0;
 }

@@ -16,6 +16,7 @@ export const search = (rb: {
     filter?: 'videos' | 'channels' | 'playlists' | 'community' | 'all',
     q: string,
     nextpage?: string,
+    ac?: AbortController,
 }) => {
     return new Promise(async (resolve, reject) => {
         let np = ""
@@ -24,7 +25,7 @@ export const search = (rb: {
         }
         const params = new URLSearchParams(rb as any).toString()
         let resp
-        try { resp = await (await fetch(`${apiroot}/${np}search?${params}`)).json() } catch { resp = {} }
+        try { resp = await (await fetch(`${apiroot}/${np}search?${params}`, { signal: rb.ac?.signal })).json() } catch { resp = {} }
         resolve(resp)
     }) as Promise<SearchResponse>
 }
@@ -115,11 +116,12 @@ type PreviewFrame = {
 
 export const getStreams = (rb: {
     id: string,
+    ac?: AbortController,
 }) => {
     return new Promise(async (resolve, reject) => {
         // leave id out of params
         let resp
-        try { resp = await (await fetch(`${apiroot}/streams/${rb.id}`)).json() } catch { resp = {} }
+        try { resp = await (await fetch(`${apiroot}/streams/${rb.id}`, { signal: rb.ac?.signal })).json() } catch { resp = {} }
         resolve(resp)
     }) as Promise<StreamsResponse>
 }
