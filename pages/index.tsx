@@ -38,9 +38,11 @@ const Home: NextPage = () => {
       display: 'flex',
       flexDirection: 'row',
       textAlign: 'left',
-      gap: 0,
+      flexWrap: 'wrap',
+      gap: '0 2rem',
       justifyContent: 'center',
-      "@media (max-width: 425px)": {
+      alignItems: 'center',
+      "@media (max-width: 480px)": {
         flexDirection: 'column',
         textAlign: 'center',
         '& > svg': {
@@ -49,17 +51,18 @@ const Home: NextPage = () => {
         }
       }
     }}>
-      <MusicNote sx={{
-        fontSize: '10rem',
-        flexShrink: 1,
-        animation: 'floating 10s ease-in-out infinite',
-        rotate: '-5deg',
-        fill: theme.palette.primary.main,
-        [theme.breakpoints.up('sm')]: {
-          fontSize: '16rem'
-        },
+      <img alt='Ossia Logo' src='/ossia_logo.png' style={{
+        width: '10rem',
+        filter: 'invert(1)',
+        height: '10rem',
+        minWidth: '10rem',
+        borderRadius: '0.4rem',
+        boxShadow: `${theme.shadows[0]} ${theme.shadows[1]} ${theme.shadows[2]} rgba(0,0,0,.4)`,
       }} />
-      <div>
+      <div style={{
+        textWrap: 'nowrap',
+        whiteSpace: 'nowrap',
+      }}>
         <Typography color={theme.palette.primary.main} variant="h1">Ossia</Typography>
         <Typography variant="h2">Just listen.</Typography>
       </div>

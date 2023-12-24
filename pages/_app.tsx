@@ -8,8 +8,11 @@ import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MusicPlayer, useMusicPlayer } from '@/components/musicPlayer';
+import { Wave } from '@/components/wave';
 
 export const MusicPlayerContext = createContext<MusicPlayer>(null as any);
+
+export const defaultShadow = ["-14px", "-6px", "20px", "black"]
 
 const theme = createTheme({
   palette: {
@@ -79,6 +82,7 @@ const PhoneNavbar = () => {
         width: '100%',
         zIndex: 100,
         minHeight: 'var(--bottom-nav-height)',
+        boxShadow: `0 5px ${defaultShadow[2]} ${defaultShadow[3]}`,
       }}
       value={value}
       onChange={(event, newValue) => {
@@ -172,6 +176,78 @@ const NowPlayingWidgetBottom = () => {
   </>)
 }
 
+export const ArtworkWaves = () => {
+  const player = useContext(MusicPlayerContext);
+  const [colors, setColors] = useState<{ start: string, stop: string } | null>(null)
+
+  useEffect(() => {
+    let ac = new AbortController();
+    fetch(`/api/getSongColors?artist=${encodeURIComponent(player.currentSong?.artist || "laurie.")}&title=${encodeURIComponent(player.currentSong?.name || "pára")}`, {
+      signal: ac.signal,
+    }).then((res) => res.json()).then((colors: string[]) => {
+      setColors({
+        start: colors[0],
+        stop: colors[1],
+      })
+    }).catch(() => {
+      setColors(null)
+    })
+    return () => {
+      ac.abort();
+    }
+  }, [player.currentSong])
+
+  return (<Box sx={{
+    content: '""',
+    position: 'absolute',
+    width: '100vw',
+    height: 'calc(100vh - var(--bottom-nav-height))',
+    transition: 'opacity .2s ease-in-out',
+    opacity: (player.playing && colors?.start && colors.stop) ? 1 : 0,
+    overflow: 'hidden',
+    top: 0,
+    left: 0,
+    zIndex: -2,
+    '& .waves': {
+      position: 'fixed',
+      width: (player.playing && colors?.start && colors.stop) ? '100vw' : '0vw',
+      transition: 'width .2s ease-in-out',
+      height: '100vh',
+      overflow: 'hidden',
+    },
+    '& .wave': {
+      position: 'absolute',
+      width: '6400px',
+      bottom: '0',
+      height: '198px',
+      animation: 'wave 6s cubic-bezier( 0.36, 0.45, 0.63, 0.53) infinite',
+    },
+    '& .wave:nth-of-type(2)': {
+      bottom: '10px',
+      animation: 'wave 6s cubic-bezier( 0.36, 0.45, 0.63, 0.53) -.125s infinite, swell 7s ease -1.25s infinite',
+      opacity: '1',
+    },
+  }} className="wavecontainer">
+    <div className="waves">
+      <Wave style={{
+        filter: `drop-shadow(${defaultShadow.join(" ")})`,
+        zIndex: -3,
+      }} gradient={{ start: colors?.start || "#fff", stop: colors?.stop || "#fff" }} className="wave" />
+      <Wave style={{
+        filter: `drop-shadow(${defaultShadow.join(" ")})`,
+        zIndex: -1,
+      }} gradient={{ start: colors?.start || "#fff", stop: colors?.stop || "#fff" }} className="wave" />
+    </div>
+    <img style={{
+      bottom: 0,
+      right: 0,
+      position: 'absolute',
+      zIndex: -2,
+      filter: `drop-shadow(${defaultShadow.join(" ")})`
+    }} alt='' width={400} height={400} src='/happy_robot.png' />
+  </Box>)
+}
+
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const musicPlayer = useMusicPlayer()
@@ -179,48 +255,54 @@ export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       (window as any).lastFm = lastFm;
+      (window as any).musicPlayer = musicPlayer;
     }
-  }, [])
+  }, [musicPlayer])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hotkeyHandler = (e: KeyboardEvent) => {
+      // TEST HOTKEY
+      if (e.ctrlKey && e.key === 'x') {
+        musicPlayer.play({
+          "name": "angyal",
+          "artist": "luvzee",
+          "url": "https://www.last.fm/music/luvzee/_/angyal",
+          "streamable": "FIXME",
+          "listeners": "8",
+          "image": [],
+          "mbid": ""
+        })
+      }
+
+      // PLAY/PAUSE and input not focused
+      if (e.key === ' ' && document.activeElement?.tagName !== 'INPUT') {
+        e.preventDefault()
+        musicPlayer.playing ? musicPlayer.pause() : musicPlayer.play(musicPlayer.currentSong || musicPlayer.queue[0])
+      }
+
+      // NEXT
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        musicPlayer.next()
+      }
+
+      // PREVIOUS
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        musicPlayer.previous()
+      }
+    }
+    window.addEventListener('keydown', hotkeyHandler)
+    return () => {
+      window.removeEventListener('keydown', hotkeyHandler)
+    }
+  }, [musicPlayer])
 
   return (<>
     <audio id="music-player-global" />
     <MusicPlayerContext.Provider value={musicPlayer}>
-      <Box sx={{
-        content: '""',
-        position: 'absolute',
-        width: musicPlayer.playing ? '100vw' : '0vw',
-        height: '100vh',
-        transition: 'width .2s ease-in-out',
-        overflow: 'hidden',
-        top: 0,
-        left: 0,
-        zIndex: -2,
-        '& .waves': {
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          overflow: 'hidden',
-        },
-        '& .wave': {
-          filter: 'hue-rotate(100deg)',
-          background: "url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/85486/wave.svg) repeat-x;",
-          position: 'absolute',
-          width: '6400px',
-          bottom: '0',
-          height: '198px',
-          animation: 'wave 6s cubic-bezier( 0.36, 0.45, 0.63, 0.53) infinite',
-        },
-        '& .wave:nth-of-type(2)': {
-          bottom: '10px',
-          animation: 'wave 6s cubic-bezier( 0.36, 0.45, 0.63, 0.53) -.125s infinite, swell 7s ease -1.25s infinite',
-          opacity: '1',
-        },
-      }} className="wavecontainer">
-        <div className="waves">
-          <div className="wave" />
-          <div className="wave" />
-        </div>
-      </Box>
+      <ArtworkWaves />
       <AnimatePresence>
         {musicPlayer.currentSong && <motion.div className='song-bg' key={musicPlayer.currentSong.url}
           initial={{ opacity: 0 }}

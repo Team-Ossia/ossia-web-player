@@ -117,11 +117,12 @@ export const useMusicPlayer = () => {
     useEffect(() => {
         const ac = new AbortController();
         if (currentSong && audio) {
+            audio.volume = 0
             setMediaSession()
-            audio.pause()
             findMusicAudio(currentSong.artist, currentSong.name, ac).then((url) => {
+                audio.volume = volume;
                 audio.src = url;
-            }).catch(()=>{
+            }).catch(() => {
                 console.log("Aborted")
             })
             setMediaSession(currentSong);

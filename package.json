@@ -13,7 +13,9 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.1",
     "@mui/material": "^5.15.1",
+    "@types/get-image-colors": "^4.0.5",
     "framer-motion": "^10.16.16",
+    "get-image-colors": "^4.0.1",
     "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18"

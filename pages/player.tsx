@@ -2,7 +2,7 @@ import { Pause, PlayArrow, SkipNext, SkipPrevious, VolumeDown, VolumeMute, Volum
 import { Box, Button, ButtonGroup, IconButton, Slider, SliderThumb, Typography } from "@mui/material";
 import type { NextPage } from "next";
 import { createElement, useContext } from "react";
-import { MusicPlayerContext } from "./_app";
+import { MusicPlayerContext, defaultShadow } from "./_app";
 import { useIsMobile } from "@/components/isMobile";
 
 export const VolumeThumbComponent = (props: any) => {
@@ -55,61 +55,16 @@ const Player: NextPage = () => {
                             bottom: 0,
                             left: 0,
                         },
-                        '&:after': {
-                            // bottom line 4px white
-                            content: '""',
-                            position: 'absolute',
-                            width: '100%',
-                            height: '4px',
-                            bottom: 0,
-                            left: 0,
-                            backgroundColor: '#fff',
-                            boxShadow: '2px 2px 2px rgba(0,0,0,0.2)',
-                            zIndex: 4,
-                            pointerEvents: 'none',
-                        }
                     }}>
                         <img draggable={false} style={{
                             borderRadius: '.4rem .4rem 0 0',
-                            boxShadow: '2px 2px 2px rgba(0,0,0.2)',
+                            boxShadow: `${defaultShadow[0]} ${defaultShadow[1]} ${defaultShadow[2]} rgba(0,0,0,.4)`,
                             overflow: 'hidden',
                             maxWidth: '50vmin',
                             transition: 'transform .2s ease-in-out',
                             transform: player.currentSong ? 'scaleY(1)' : 'scaleY(0)',
                             height: 'auto',
                         }} alt="" src={player.currentSong ? `/api/artwork?artist=${player.currentSong?.artist}&title=${player.currentSong?.name}` : ""} width={256} height={256} />
-                        <Box className="innerText" sx={{
-                            display: 'flex',
-                            paddingRight: '1rem',
-                            borderRadius: '0 .6rem 0 0',
-                            overflow: 'hidden',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'flex-start',
-                            gap: 0,
-                            paddingLeft: '1rem',
-                            zIndex: 2,
-                            pointerEvents: 'none',
-                            paddingBottom: '.2rem',
-                            textShadow: '2px 2px 2px rgba(0,0,0,0.5)',
-                            backdropFilter: 'brightness(.9) blur(4px) saturate(.5)',
-                            '&:before': {
-                                content: '""',
-                                position: 'absolute',
-                                width: '4px',
-                                height: '100%',
-                                top: 0,
-                                left: 0,
-                                backgroundColor: '#fff',
-                                borderRadius: '0 0.4rem 0 0',
-                                boxShadow: '2px 2px 2px rgba(0,0,0,0.2)',
-                            }
-                        }}>
-                            <Typography style={{
-                            }} variant="h5">{player.currentSong?.name || "Resting..."}</Typography>
-                            <Typography style={{
-                            }} variant="subtitle1">{player.currentSong?.artist}</Typography>
-                        </Box>
                         {!isMobile &&
                             <Slider slots={{
                                 thumb: VolumeThumbComponent
@@ -150,6 +105,17 @@ const Player: NextPage = () => {
                         }
                     </Box>
                 </Box>
+                <Box>
+                    <Typography sx={{
+                        fontSize: '1.5rem',
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                    }} variant="h5">{player.currentSong?.name}</Typography>
+                    <Typography sx={{
+                        fontSize: '1rem',
+                        textAlign: 'center',
+                    }} variant="body1">{player.currentSong?.artist}</Typography>
+                </Box>
                 <Box sx={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -166,6 +132,7 @@ const Player: NextPage = () => {
                         width: '3rem',
                         height: '3rem',
                         overflow: 'hidden',
+                        filter: `drop-shadow(${defaultShadow.join(' ')})`,
                     }} onClick={() => {
                         player.pause()
                     }}>
