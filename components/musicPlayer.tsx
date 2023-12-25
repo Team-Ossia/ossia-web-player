@@ -64,7 +64,7 @@ export const useMusicPlayer = () => {
 
     useEffect(() => {
         if (isMobile) {
-            setVolume(1)
+            setVolume(.5)
         }
     }, [isMobile])
 
