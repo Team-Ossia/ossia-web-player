@@ -8,7 +8,7 @@ export default function handler(
     res: NextApiResponse<any>
 ) {
     return new Promise<void>(async (resolve, reject) => {
-        const notletters = /[^a-zA-Z0-9\-éáóöőúüű]/g;
+        const notletters = /[^a-zA-Z0-9\-éáóöőúüű]/gi;
 
         const artist = req.query.a as string
         const title = req.query.t as string
@@ -51,6 +51,7 @@ export default function handler(
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         res.setHeader('Access-Control-Max-Age', '86400');
         res.setHeader('X-VideoID', videoID);
+        res.setHeader('X-Query', query);
         if (stream.contentLength) {
             res.setHeader('Content-Length', stream.contentLength);
             res.setHeader('Accept-Ranges', 'bytes');
