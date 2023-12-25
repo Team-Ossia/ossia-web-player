@@ -1,8 +1,9 @@
 import '@/styles/globals.css'
+import '@/styles/starry_night.scss';
 import type { AppProps } from 'next/app'
 import lastFm from '@/components/lastFm';
 import { createContext, createElement, useContext, useEffect, useMemo, useState } from 'react';
-import { BottomNavigation, BottomNavigationAction, Box, Container, CssBaseline, IconButton, SvgIconTypeMap, ThemeProvider, createTheme } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction, Box, Container, CssBaseline, IconButton, SvgIconTypeMap, ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
 import { Album, Home, Pause, PlayArrow, Search, Settings } from '@mui/icons-material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { useRouter } from 'next/router';
@@ -11,6 +12,13 @@ import { MusicPlayer, useMusicPlayer } from '@/components/musicPlayer';
 import { Wave } from '@/components/wave';
 import { dvh, lvh, svh } from '@/components/units';
 import { useIsMobile } from '@/components/isMobile';
+import Snowfall from 'react-snowfall';
+import { Rain } from 'react-rainfall';
+import { useCookies } from 'react-cookie';
+import dynamic from 'next/dynamic';
+import { useGeo } from '@/components/useGeo';
+import { useWeather } from '@/components/useWeather';
+import { StarryNight } from '@/components/starry_night';
 
 export const MusicPlayerContext = createContext<MusicPlayer>(null as any);
 
@@ -76,11 +84,11 @@ const pages: {
     //   label: 'Player',
     //   href: '/player'
     // },
-    // {
-    //   icon: Settings,
-    //   label: 'Settings',
-    //   href: '/settings'
-    // }
+    {
+      icon: Settings,
+      label: 'Settings',
+      href: '/settings'
+    }
   ]
 
 const PhoneNavbar = () => {
@@ -279,6 +287,134 @@ export const ArtworkWaves = () => {
   </Box>)
 }
 
+const WeatherEffectsSSR = () => {
+  const [cookies] = useCookies(['weatherEffects'])
+  const { whatIsFalling, isDay } = useWeather()
+  const isMobile = useIsMobile()
+  const router = useRouter()
+  const wideScreen = useMediaQuery('(min-width: 1400px)')
+  const showMoon = useMemo(() => {
+    return !isDay && ((!wideScreen && router.pathname.startsWith("/player")) || wideScreen)
+  }, [router.pathname, isMobile, isDay])
+
+  return (<AnimatePresence mode='wait'>
+    {cookies.weatherEffects != false &&
+      <motion.div
+        key="weather-effects"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <Box className="weather" sx={{
+          '& *': {
+            zIndex: -1,
+          }
+        }}>
+          {whatIsFalling == "rain" && <Rain numDrops={10} />}
+          {whatIsFalling == "snow" && <Snowfall snowflakeCount={15} />}
+          <Box sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            opacity: !isDay ? 1 : 0,
+            transition: 'opacity .4s ease-in-out',
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0,0,0,.3)',
+            zIndex: -1,
+          }} >
+            <AnimatePresence>
+              {(!isDay && !whatIsFalling) && <motion.div key="starry-night"
+                initial={{ opacity: 0, }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: .4, type: 'keyframes' }}
+                style={{ overflow: 'hidden' }}
+              >
+                <StarryNight />
+              </motion.div>}
+              {showMoon && <motion.div key="moon"
+                initial={{
+                  opacity: 0,
+                }}
+                animate={{
+                  opacity: 1, transition: {
+                    delay: .6,
+                  }
+                }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: .4, type: 'keyframes' }}
+                style={{ overflow: 'hidden' }}
+              >
+                <img src='/actors/full_moon.svg' alt="" style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  margin: '1rem',
+                  animation: 'floating 20s ease-in-out infinite',
+                  height: '10rem',
+                  width: 'auto',
+                  zIndex: -1,
+                  // moonlight effect
+                  filter: 'drop-shadow(0 0 20px rgba(255,255,255,.5))',
+                }} />
+              </motion.div>}
+            </AnimatePresence>
+          </Box>
+        </Box>
+      </motion.div>
+    }
+  </AnimatePresence>)
+}
+
+const WeatherEffects = dynamic(() => Promise.resolve(WeatherEffectsSSR), {
+  ssr: false,
+})
+
+const CookiesHandler = () => {
+  const [cookies, setCookie] = useCookies(['weatherEffects', 'geolocate-method'])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (cookies["geolocate-method"] === undefined) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        if (result.state == 'granted') {
+          setCookie('geolocate-method', '2', {
+            path: '/',
+            maxAge: 60 * 60 * 24 * 365 * 10,
+          })
+        } else {
+          setCookie('geolocate-method', '1', {
+            path: '/',
+            maxAge: 60 * 60 * 24 * 365 * 10,
+          })
+        }
+      })
+    }
+    if (cookies['geolocate-method'] == 2) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        if (result.state == 'granted') {
+          console.log("Permission granted")
+        } else {
+          setCookie('geolocate-method', '1', {
+            path: '/',
+            maxAge: 60 * 60 * 24 * 365 * 10,
+          })
+        }
+      })
+    }
+
+    if (cookies.weatherEffects === undefined) {
+      setCookie('weatherEffects', true, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365 * 10,
+      })
+    }
+  }, [])
+
+  return (<></>)
+}
+
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const musicPlayer = useMusicPlayer()
@@ -320,6 +456,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [musicPlayer])
 
   return (<>
+    <CookiesHandler />
     <div
       style={{
         display: 'none',
@@ -330,26 +467,31 @@ export default function App({ Component, pageProps }: AppProps) {
     </div>
     <audio id="music-player-global" />
     <MusicPlayerContext.Provider value={musicPlayer}>
-      <ArtworkWaves />
-      <AnimatePresence>
-        {musicPlayer.currentSong && <motion.div className='song-bg' key={musicPlayer.currentSong.url}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        ><Box sx={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          width: '100vw',
-          height: "100vh",
-          zIndex: -1,
-          opacity: 0.1,
-          filter: 'blur(10px)',
-          backgroundImage: `url("/api/artwork?artist=${encodeURIComponent(musicPlayer.currentSong?.artist)}&title=${encodeURIComponent(musicPlayer.currentSong?.name)}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }} /></motion.div>}
-      </AnimatePresence>
+      <div style={{
+        pointerEvents: 'none',
+      }} className="filters">
+        <WeatherEffects />
+        <ArtworkWaves />
+        <AnimatePresence>
+          {musicPlayer.currentSong && <motion.div className='song-bg' key={musicPlayer.currentSong.url}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          ><Box sx={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100vw',
+            height: "100vh",
+            zIndex: -1,
+            opacity: 0.1,
+            filter: 'blur(10px)',
+            backgroundImage: `url("/api/artwork?artist=${encodeURIComponent(musicPlayer.currentSong?.artist)}&title=${encodeURIComponent(musicPlayer.currentSong?.name)}")`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }} /></motion.div>}
+        </AnimatePresence>
+      </div>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div style={{
@@ -389,7 +531,7 @@ export default function App({ Component, pageProps }: AppProps) {
                     }, 100)
                   }}
                   style={{ overflow: 'hidden' }}
-                  transition={{ duration: .3 }}
+                  transition={{ duration: .3, type: 'keyframes' }}
                   initial={{ translateX: '100%' }}
                   animate={{
                     translateX: '0%',

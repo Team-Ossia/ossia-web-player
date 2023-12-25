@@ -14,5 +14,7 @@ export default async function handler(
         res.status(200).json(colors.map(color => color.hex()))
     }).catch(err => {
         res.status(500).json({ error: err.message })
+    }).finally(() => {
+        res.end()
     })
 }
