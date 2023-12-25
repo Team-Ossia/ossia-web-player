@@ -9,8 +9,10 @@ const thoughts = [
     "I wish I could've told you how I felt...",
 ]
 
+thoughts.sort(() => Math.random() - 0.5);
+
 export const useRoboThought = () => {
-    const [thought, setThought] = useState('');
+    const [thought, setThought] = useState(thoughts[Math.floor(Math.random() * thoughts.length)]);
     const [display, setDisplay] = useState(false);
     const { isDay } = useWeather();
 
@@ -20,7 +22,10 @@ export const useRoboThought = () => {
             if (e.key === 't' && document.activeElement?.tagName !== 'INPUT' && !isDay && !display) {
                 e.preventDefault()
                 if (window.innerWidth < 1500) return;
-                setThought(thoughts[Math.floor(Math.random() * thoughts.length)]);
+                //cycle to next thought
+                const thoughtIndex = thoughts.findIndex(t => t === thought);
+                if (thoughtIndex === thoughts.length - 1) setThought(thoughts[0]);
+                else setThought(thoughts[thoughtIndex + 1]);
                 setDisplay(true);
                 setTimeout(() => {
                     setDisplay(false);
