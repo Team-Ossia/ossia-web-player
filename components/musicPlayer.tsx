@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 import { Song } from "./lastFm";
 import { useIsMobile } from "./isMobile";
 import { useRouter } from "next/router";
@@ -35,10 +35,12 @@ export const useMusicPlayer = () => {
     const [currentSong, setCurrentSong] = useState<Song | null>(null);
     const [volume, setVolume] = useState(0.5);
     const isMobile = useIsMobile()
-    const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
     const router = useRouter()
     const [audioLoading, setAudioLoading] = useState(false);
-    const [currentTime, setCurrentTimeState] = useState(0);
+    const audio = useMemo(() => {
+        if (typeof window === 'undefined') return;
+        return document.getElementById("music-player-global") as HTMLAudioElement;
+    }, [])
 
     useEffect(() => {
         if (isMobile) {
@@ -88,16 +90,14 @@ export const useMusicPlayer = () => {
             setAudioLoading(false);
             audio.play();
         }
-        const onSongProgress = () => {
-            setCurrentTimeState(audio.currentTime);
-        }
         audio.addEventListener("play", onAudioStart);
         audio.addEventListener("pause", onAudioPause);
         audio.addEventListener("ended", onAudioEnd);
         audio.addEventListener("error", onAudioError);
         audio.addEventListener("loadstart", onLoadStart);
         audio.addEventListener("loadeddata", onAudioLoaded);
-        audio.addEventListener("timeupdate", onSongProgress);
+        audio.addEventListener("waiting", onLoadStart);
+        audio.addEventListener("stalled", onLoadStart);
         return () => {
             audio.removeEventListener("play", onAudioStart);
             audio.removeEventListener("pause", onAudioPause);
@@ -105,20 +105,12 @@ export const useMusicPlayer = () => {
             audio.removeEventListener("error", onAudioError);
             audio.removeEventListener("loadstart", onLoadStart);
             audio.removeEventListener("loadeddata", onAudioLoaded);
-            audio.removeEventListener("timeupdate", onSongProgress);
         }
     }, [audio])
 
     useEffect(() => {
-        if (typeof window === 'undefined') return;
-        const audio = document.getElementById("music-player-global") as HTMLAudioElement;
-        setAudio(audio);
-    }, [])
-
-    useEffect(() => {
         const ac = new AbortController();
         if (currentSong && audio) {
-            audio.volume = volume;
             audio.src = `/api/audio?a=${currentSong.artist}&t=${currentSong.name}`;
             setMediaSession(currentSong);
             return () => {

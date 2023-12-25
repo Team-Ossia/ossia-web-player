@@ -70,9 +70,11 @@ type StreamsResponse = {
 type AudioStream = {
     url: string;
     format: string;
+    bitrate: number;
     quality: string;
     mimeType: string;
     codec: string;
+    contentLength?: number;
     // Add more properties if needed
 };
 
@@ -86,6 +88,7 @@ type VideoStream = {
     height: number;
     fps: number;
     bitrate: number;
+    contentLength?: number;
     // Add more properties if needed
 };
 

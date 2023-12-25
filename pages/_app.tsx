@@ -2,7 +2,7 @@ import '@/styles/globals.css'
 import '@/styles/starry_night.scss';
 import type { AppProps } from 'next/app'
 import lastFm from '@/components/lastFm';
-import { createContext, createElement, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, createElement, memo, useContext, useEffect, useMemo, useState } from 'react';
 import { BottomNavigation, BottomNavigationAction, Box, CircularProgress, Container, CssBaseline, IconButton, SvgIconTypeMap, ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
 import { Album, Home, Pause, PlayArrow, Search, Settings } from '@mui/icons-material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
@@ -289,6 +289,8 @@ export const ArtworkWaves = () => {
   </Box>)
 }
 
+export const MusicPlayerGlobal = memo(() => <audio id="music-player-global" />)
+
 const WeatherEffectsSSR = () => {
   const [cookies] = useCookies(['weatherEffects'])
   const { whatIsFalling, isDay } = useWeather()
@@ -461,6 +463,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [musicPlayer])
 
   return (<>
+    <MusicPlayerGlobal />
     <CookiesHandler />
     <div
       style={{
@@ -470,7 +473,6 @@ export default function App({ Component, pageProps }: AppProps) {
       <h1>Ossia | Music at your fingertips</h1>
       <h2>A free alternative to music streaming, Ossia adapts to the music and your environment</h2>
     </div>
-    <audio id="music-player-global" />
     <MusicPlayerContext.Provider value={musicPlayer}>
       <div style={{
         pointerEvents: 'none',
