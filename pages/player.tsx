@@ -137,15 +137,16 @@ const Player: NextPage = () => {
                             <IconButton>
                                 <SkipPrevious fontSize="large" />
                             </IconButton>
-                            <Button variant="contained" sx={{
+                            <Button onClick={(e) => {
+                                e.stopPropagation()
+                                player.pause()
+                            }} variant="contained" sx={{
                                 borderRadius: '100%',
                                 minWidth: 'unset',
                                 width: '3rem',
                                 height: '3rem',
                                 overflow: 'hidden',
                                 filter: `drop-shadow(${defaultShadow.join(' ')})`,
-                            }} onClick={() => {
-                                player.pause()
                             }}>
                                 {player.playing ? <Pause fontSize="large" /> : <PlayArrow fontSize="large" />}
                             </Button>

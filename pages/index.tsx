@@ -1,12 +1,129 @@
 import lastFm, { Song } from '@/components/lastFm';
 import { MusicNote, Search } from '@mui/icons-material';
-import { Box, Button, Divider, FormControl, IconButton, TextField, Typography, useTheme } from '@mui/material';
+import { Box, Button, CircularProgress, Divider, FormControl, IconButton, TextField, Typography, useTheme } from '@mui/material';
 import type { NextPage } from 'next';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { MusicPlayerContext } from './_app';
-import { useIsMobile } from '@/components/isMobile';
+import { useIsIos, useIsMobile } from '@/components/isMobile';
+import { findMusicAudio } from '@/components/musicPlayer';
+import { AnimatePresence, motion } from 'framer-motion';
+
+const PlayableSong = ({ song }: { song: Song }) => {
+  const [songData, setSongData] = useState<Song>(song)
+  const [loading, setLoading] = useState(false)
+  const isIos = useIsIos()
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.dispatchEvent(new CustomEvent('buttons-reload'))
+  }, [songData])
+
+  return (<Box
+    onClick={isIos ? () => {
+      if (!songData?.pipedStream) {
+        setLoading(true)
+        findMusicAudio(song.artist, song.name).then((url) => {
+          setSongData({
+            ...song,
+            pipedStream: url,
+          })
+        }).finally(() => {
+          setLoading(false)
+        })
+      }
+    } : undefined}
+    data-playbutton={isIos ? JSON.stringify(!!songData?.pipedStream) : "true"} data-song={JSON.stringify(songData)} component="button" key={`${song.url}`} sx={(theme) => ({
+      display: 'flex',
+      backgroundColor: "transparent",
+      textAlign: 'left',
+      alignItems: 'center',
+      position: 'relative',
+      gap: '1rem',
+      border: '1px solid transparent',
+      borderRadius: '0.4rem',
+      transition: 'border-color .05s ease-in-out, padding .05s ease-in-out',
+      'div:has(h5)': {
+        transition: 'margin-left .2s ease-in-out',
+      },
+      ':hover div:has(h5)': {
+        marginLeft: '.4rem',
+      },
+      ':before': {
+        content: '""',
+        position: 'absolute',
+        width: 0,
+        height: '4px',
+        bottom: 0,
+        right: 0,
+        borderRadius: '0.4rem',
+        backgroundColor: theme.palette.primary.main,
+        transition: 'width .2s ease-in-out',
+      },
+      '&:hover:before': {
+        width: 'calc(100% - 3.8rem)',
+      },
+      '&:focus:before': {
+        width: '100%',
+      },
+      '&:hover': {
+        cursor: 'pointer',
+      },
+      '&:focus': {
+        borderColor: theme.palette.primary.main,
+        outline: 'none',
+        padding: '0.4rem',
+      }
+    })}>
+    <AnimatePresence>
+      {loading && <motion.div
+        key="loading"
+        initial={{ width: 0 }}
+        animate={{ width: "auto" }}
+        exit={{
+          width: 0, transition: {
+            delay: .5,
+          }
+        }}
+        style={{
+          overflow: 'hidden',
+        }}>
+        <CircularProgress />
+      </motion.div>
+      }
+    </AnimatePresence>
+    <img style={{
+      backgroundColor: "white",
+      borderRadius: '0.4rem',
+      width: 64,
+      height: 64,
+      minWidth: 64,
+    }} alt={song.name} src={`/api/artwork?artist=${song.artist}&title=${song.name}`} width={64} height={64} />
+    <div style={{
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'flex-start',
+      gap: '.2rem',
+      flexShrink: 1,
+    }}>
+      <Typography style={{
+        // line clamp 2
+        display: '-webkit-box',
+        WebkitBoxOrient: 'vertical',
+        color: "white",
+        WebkitLineClamp: 2,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      }} variant="h5">{song.name}</Typography>
+      <Typography style={{
+        color: "white",
+      }} variant="subtitle1">{song.artist}</Typography>
+    </div>
+  </Box>)
+}
 
 const Home: NextPage = () => {
   const theme = useTheme()
@@ -15,6 +132,10 @@ const Home: NextPage = () => {
   const [query, setQuery] = useState<string>("")
   const player = useContext(MusicPlayerContext)
   const isMobile = useIsMobile()
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('buttons-reload'))
+  }, [searchResults])
 
   const search = () => {
     if (query.length < 1) {
@@ -90,77 +211,7 @@ const Home: NextPage = () => {
       gap: '.5rem',
     }}>
       {searchResults && searchResults.map((song, i) => {
-        return (<Box onClick={() => {
-          player.play(song)
-        }} component="button" key={`${song.url}`} sx={{
-          display: 'flex',
-          backgroundColor: "transparent",
-          textAlign: 'left',
-          alignItems: 'center',
-          position: 'relative',
-          gap: '1rem',
-          border: '1px solid transparent',
-          borderRadius: '0.4rem',
-          transition: 'border-color .05s ease-in-out, padding .05s ease-in-out',
-          'div:has(h5)': {
-            transition: 'margin-left .2s ease-in-out',
-          },
-          ':hover div:has(h5)': {
-            marginLeft: '.4rem',
-          },
-          ':before': {
-            content: '""',
-            position: 'absolute',
-            width: 0,
-            height: '4px',
-            bottom: 0,
-            right: 0,
-            borderRadius: '0.4rem',
-            backgroundColor: theme.palette.primary.main,
-            transition: 'width .2s ease-in-out',
-          },
-          '&:hover:before': {
-            width: 'calc(100% - 3.8rem)',
-          },
-          '&:focus:before': {
-            width: '100%',
-          },
-          '&:hover': {
-            cursor: 'pointer',
-          },
-          '&:focus': {
-            borderColor: theme.palette.primary.main,
-            outline: 'none',
-            padding: '0.4rem',
-          }
-        }}>
-          <img style={{
-            backgroundColor: theme.palette.common.white,
-            borderRadius: '0.4rem',
-            width: 64,
-            height: 64,
-            minWidth: 64,
-          }} alt={song.name} src={`/api/artwork?artist=${song.artist}&title=${song.name}`} width={64} height={64} />
-          <div style={{
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            gap: '.2rem',
-            flexShrink: 1,
-          }}>
-            <Typography style={{
-              // line clamp 2
-              display: '-webkit-box',
-              WebkitBoxOrient: 'vertical',
-              WebkitLineClamp: 2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }} variant="h5">{song.name}</Typography>
-            <Typography variant="subtitle1">{song.artist}</Typography>
-          </div>
-        </Box>)
+        return (<PlayableSong key={`${song.url}`} song={song} />)
       })}
     </Box>
   </div>;

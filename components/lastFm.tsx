@@ -12,6 +12,7 @@ export type Song = {
         size: string,
     }[],
     mbid: string,
+    pipedStream?: string,
 }
 
 export const querySongs = async (query: string) => {

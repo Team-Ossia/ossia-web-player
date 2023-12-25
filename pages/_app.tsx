@@ -145,7 +145,9 @@ const NowPlayingWidgetBottom = () => {
   return (<>
     <AnimatePresence>
       {!router.pathname.startsWith("/player") && musicPlayer.currentSong !== null &&
-        <motion.div className='now-playing-widget' key="now-playing-widget" onClick={() => {
+        <motion.div onAnimationEnd={() => {
+          window.dispatchEvent(new CustomEvent('buttons-reload'))
+        }} className='now-playing-widget' key="now-playing-widget" onClick={() => {
           router.push('/player')
         }}
           initial={{ bottom: 'calc(var(--bottom-nav-height) * -1)' }}
@@ -298,7 +300,7 @@ const WeatherEffectsSSR = () => {
   }, [router.pathname, isMobile, isDay])
 
   return (<AnimatePresence mode='wait'>
-    {cookies.weatherEffects != false &&
+    {cookies.weatherEffects == true &&
       <motion.div
         key="weather-effects"
         initial={{ opacity: 0 }}
@@ -317,7 +319,7 @@ const WeatherEffectsSSR = () => {
             position: 'fixed',
             top: 0,
             left: 0,
-            opacity: !isDay ? 1 : 0,
+            opacity: isDay === false ? 1 : 0,
             transition: 'opacity .4s ease-in-out',
             width: '100vw',
             height: '100vh',
@@ -325,7 +327,7 @@ const WeatherEffectsSSR = () => {
             zIndex: -1,
           }} >
             <AnimatePresence>
-              {(!isDay && !whatIsFalling) && <motion.div key="starry-night"
+              {(isDay === false && !whatIsFalling) && <motion.div key="starry-night"
                 initial={{ opacity: 0, }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -420,6 +422,12 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const musicPlayer = useMusicPlayer()
   const isMobile = useIsMobile()
+
+  useEffect(() => {
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('buttons-reload'))
+    }, 500)
+  }, [router])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
