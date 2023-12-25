@@ -13,9 +13,19 @@ export default async function handler(
         q: query,
         filter: 'videos',
     })
+    // if no results
+    if (!results.items[0]) {
+        res.status(404).json({ error: 'No results found' })
+        return
+    }
     const streams = await piped.getStreams({
         id: results.items[0].url.split('?v=')[1],
     })
+    // if no streams
+    if (!streams.audioStreams[0]) {
+        res.status(404).json({ error: 'No streams found' })
+        return
+    }
     const stream = streams.audioStreams[0].url
 
     res.setHeader('Content-Type', 'audio/mp4')

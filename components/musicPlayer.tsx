@@ -31,6 +31,8 @@ export const setMediaSession = (song?: Song) => {
     }
 }
 
+const notletters = /[^a-zA-Z0-9áóöőúüű]/g;
+
 export const useMusicPlayer = () => {
     const [playing, setPlaying] = useState(false);
     const [currentSong, setCurrentSong] = useState<Song | null>(null);
@@ -120,7 +122,7 @@ export const useMusicPlayer = () => {
         const ac = new AbortController();
         if (currentSong && audio) {
             audio.volume = volume;
-            audio.src = `/api/audio?s=${btoa(currentSong.artist + " " + currentSong.name)}`;
+            audio.src = `/api/audio?s=${encodeURIComponent(btoa(currentSong.artist.replace(notletters, '').toLowerCase() + " " + currentSong.name.replace(notletters, '').toLowerCase()))}`;
             setMediaSession(currentSong);
             return () => {
                 ac.abort();
