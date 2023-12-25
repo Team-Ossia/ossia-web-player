@@ -57,6 +57,10 @@ const InnerPage = () => {
                         animate={{
                             height: cookies.weatherEffects == true ? 'auto' : 0,
                         }}
+                        transition={{
+                            duration: .2,
+                            type: 'keyframes',
+                        }}
                     >
                         <Divider style={{ margin: '.5rem 0' }} />
                         <Box sx={{

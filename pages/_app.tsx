@@ -151,7 +151,7 @@ const NowPlayingWidgetBottom = () => {
           initial={{ bottom: 'calc(var(--bottom-nav-height) * -1)' }}
           animate={{ bottom: 'calc(var(--bottom-nav-height) * 1.2)' }}
           exit={{ bottom: 'calc(var(--bottom-nav-height) * -1)' }}
-          transition={{ duration: .4 }}
+          transition={{ duration: .4, type: 'keyframes' }}
           style={{
             height: 'var(--now-playing-widget-height)',
             width: '100%',
@@ -304,6 +304,7 @@ const WeatherEffectsSSR = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        transition={{ duration: .4, type: 'keyframes' }}
       >
         <Box className="weather" sx={{
           '& *': {
@@ -477,6 +478,7 @@ export default function App({ Component, pageProps }: AppProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: .4, type: 'keyframes' }}
           ><Box sx={{
             position: 'fixed',
             bottom: 0,
