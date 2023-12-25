@@ -20,6 +20,12 @@ export const querySongs = async (query: string) => {
     }));
 
     data.results.trackmatches.track = data.results.trackmatches.track.filter((_: Song, i: number) => filteredTracks[i]);
+
+    data.results.trackmatches.track = data.results.trackmatches.track.filter((song: Song, i: number) => {
+        // remove duplicates
+        return data.results.trackmatches.track.findIndex((s: Song) => s.name.toLowerCase() === song.name.toLowerCase()) === i;
+    });
+
     return data;
 };
 

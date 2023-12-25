@@ -176,6 +176,19 @@ const NowPlayingWidgetBottom = () => {
             justifyContent: 'space-between',
             overflow: 'hidden',
             flexDirection: 'row',
+            position: 'relative',
+            ':after': {
+              // bottom line with primary color
+              content: '""',
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              height: '3px',
+              transition: 'width .4s linear',
+              width: (musicPlayer.currentSong) ? musicPlayer.percentage : '0',
+              zIndex: 99,
+              backgroundColor: theme.palette.primary.main,
+            }
           })}>
             <Box sx={{
               display: 'flex',

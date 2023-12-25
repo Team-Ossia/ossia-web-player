@@ -24,10 +24,22 @@ const Player: NextPage = () => {
     const player = useContext(MusicPlayerContext);
     const isMobile = useIsMobile()
     const router = useRouter()
+    const [seekbar, setSeekbar] = useState(0)
+    const [seeking, setSeeking] = useState(false)
 
     useEffect(() => {
         if (!player.currentSong) router.push("/")
     }, [player, router])
+
+    useEffect(() => {
+        setSeeking(player.audioLoading)
+    }, [player.audioLoading])
+
+    useEffect(() => {
+        if (!seeking) {
+            setSeekbar(player.currentTime)
+        }
+    }, [player.currentTime, seeking])
 
     return (<>
         <Container sx={{
@@ -174,6 +186,28 @@ const Player: NextPage = () => {
                             </IconButton>
                         </Box>
                     </Box>
+                    <Slider onChange={(e, v) => {
+                        setSeekbar(v as number)
+                    }} onMouseDown={() => {
+                        setSeeking(true)
+                    }} onMouseUp={() => {
+                        player.seek(seekbar)
+                    }} step={.1} size="medium" min={0} max={player.duration} value={seeking ? seekbar : player.currentTime} sx={{
+                        width: '100%',
+                        maxWidth: 470,
+                        marginTop: '.5rem',
+                        '& > span.MuiSlider-thumb': {
+                            transition: 'transform .2s ease-in-out',
+                        },
+                        '& > span.MuiSlider-track': {
+                            transition: 'background-color .2s ease-in-out',
+                            backgroundColor: seeking ? 'rgba(255,255,255,.8)' : 'rgba(255,255,255,.4)',
+                        },
+                        '& > span.MuiSlider-rail': {
+                            transition: 'background-color .2s ease-in-out',
+                            backgroundColor: seeking ? 'rgba(255,255,255,.8)' : 'rgba(255,255,255,.4)',
+                        },
+                    }} />
                 </Box>
             }
         </Container>

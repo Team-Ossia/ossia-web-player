@@ -4,13 +4,17 @@ import { useIsMobile } from "./isMobile";
 import { useRouter } from "next/router";
 
 export type MusicPlayer = {
-    playing: boolean,
-    audioLoading: boolean,
-    currentSong: Song | null,
-    volume: number,
-    setVolume: (volume: number) => void,
-    play: (song: Song) => void,
-    pause: () => void,
+    playing: boolean;
+    audioLoading: boolean;
+    currentSong: Song | null;
+    volume: number;
+    currentTime: number;
+    duration: number;
+    percentage: number;
+    setVolume: (volume: number) => void;
+    play: (song: Song) => void;
+    pause: () => void;
+    seek: (time: number) => void;
 }
 
 export const setMediaSession = (song?: Song) => {
@@ -37,6 +41,12 @@ export const useMusicPlayer = () => {
     const isMobile = useIsMobile()
     const router = useRouter()
     const [audioLoading, setAudioLoading] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const percentage = useMemo(() => {
+        if (duration === 0) return 0;
+        return currentTime / duration;
+    }, [currentTime, duration])
     const audio = useMemo(() => {
         if (typeof window === 'undefined') return;
         return document.getElementById("music-player-global") as HTMLAudioElement;
@@ -90,12 +100,19 @@ export const useMusicPlayer = () => {
             setAudioLoading(false);
             audio.play();
         }
+        const onProgress = () => {
+            setCurrentTime(audio.currentTime);
+            setDuration(audio.duration);
+            setAudioLoading(false);
+        }
         audio.addEventListener("play", onAudioStart);
         audio.addEventListener("pause", onAudioPause);
         audio.addEventListener("ended", onAudioEnd);
         audio.addEventListener("error", onAudioError);
         audio.addEventListener("loadstart", onLoadStart);
         audio.addEventListener("loadeddata", onAudioLoaded);
+        audio.addEventListener("timeupdate", onProgress);
+        audio.addEventListener("waiting", onLoadStart)
         return () => {
             audio.removeEventListener("play", onAudioStart);
             audio.removeEventListener("pause", onAudioPause);
@@ -103,6 +120,7 @@ export const useMusicPlayer = () => {
             audio.removeEventListener("error", onAudioError);
             audio.removeEventListener("loadstart", onLoadStart);
             audio.removeEventListener("loadeddata", onAudioLoaded);
+            audio.removeEventListener("timeupdate", onProgress);
         }
     }, [audio])
 
@@ -127,6 +145,11 @@ export const useMusicPlayer = () => {
         setPlaying(true);
     }
 
+    const seek = (time: number) => {
+        if (!audio) return;
+        audio.currentTime = time;
+    }
+
     const pause = () => {
         // toggle
         if (playing) {
@@ -142,8 +165,12 @@ export const useMusicPlayer = () => {
         audioLoading,
         currentSong,
         volume,
+        currentTime,
+        duration,
+        percentage,
         setVolume,
         play,
         pause,
+        seek,
     }
 }
