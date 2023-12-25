@@ -3,7 +3,7 @@ import '@/styles/starry_night.scss';
 import type { AppProps } from 'next/app'
 import lastFm from '@/components/lastFm';
 import { createContext, createElement, memo, useContext, useEffect, useMemo, useState } from 'react';
-import { BottomNavigation, BottomNavigationAction, Box, CircularProgress, Container, CssBaseline, IconButton, SvgIconTypeMap, ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction, Box, CircularProgress, Container, CssBaseline, IconButton, SvgIconTypeMap, ThemeProvider, Typography, createTheme, useMediaQuery } from '@mui/material';
 import { Album, Home, Pause, PlayArrow, Search, Settings } from '@mui/icons-material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { useRouter } from 'next/router';
@@ -19,6 +19,7 @@ import dynamic from 'next/dynamic';
 import { useGeo } from '@/components/useGeo';
 import { useWeather } from '@/components/useWeather';
 import { StarryNight } from '@/components/starry_night';
+import { useRoboThought } from '@/components/roboThought';
 
 export const MusicPlayerContext = createContext<MusicPlayer>(null as any);
 
@@ -233,6 +234,7 @@ const NowPlayingWidgetBottom = () => {
 export const ArtworkWaves = () => {
   const player = useContext(MusicPlayerContext);
   const [colors, setColors] = useState<{ start: string, stop: string } | null>(null)
+  const robo = useRoboThought()
 
   useEffect(() => {
     let ac = new AbortController();
@@ -292,7 +294,7 @@ export const ArtworkWaves = () => {
       }} gradient={{ start: colors?.start || "#fff", stop: colors?.stop || "#fff" }} className="wave" />
     </div>
     <AnimatePresence>
-      {player.playing && <motion.img
+      {player.playing && <motion.div
         //slide up from bottom
         initial={{
           bottom: '-100vh'
@@ -307,10 +309,74 @@ export const ArtworkWaves = () => {
           right: 0,
           position: 'absolute',
           zIndex: -2,
-          filter: `drop-shadow(${defaultShadow.join(" ")})`
-        }} alt='' width={400} height={400} src='/happy_robot.png' />}
+        }}
+      >
+        <Box
+          sx={{
+            position: 'relative'
+          }}
+        >
+          <AnimatePresence>
+            {robo.display && <motion.div
+              initial={{
+                opacity: 0,
+                scale: 0,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0,
+              }}
+              transition={{ duration: .2, type: 'keyframes', ease: 'easeInOut' }}
+            >
+              <Box className="thought-bubble"
+                //thought bubble pointing to bottom right
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: 'auto',
+                  transform: 'translate(-50%, -100%)',
+                  backgroundColor: 'rgba(255,255,255,.1)',
+                  borderRadius: '1rem',
+                  zIndex: -1,
+                  filter: `drop-shadow(${defaultShadow.join(" ")})`,
+                  ':after': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '100%',
+                    left: '100%',
+                    width: 20,
+                    height: 20,
+                    borderRadius: 4,
+                  }
+                }}
+              >
+                <Typography variant='body1' sx={{
+                  padding: '1rem',
+                }}>
+                  {robo.thought}
+                </Typography>
+              </Box>
+            </motion.div>}
+          </AnimatePresence>
+          <img
+            style={{
+              filter: `drop-shadow(${defaultShadow.join(" ")})`,
+              height: 400,
+              maxHeight: '50vh',
+              width: 'auto',
+              pointerEvents: 'all',
+            }}
+            alt='' height={400} src='/happy_robot.png' />
+        </Box>
+      </motion.div>}
     </AnimatePresence>
-  </Box>)
+  </Box >)
 }
 
 export const MusicPlayerGlobal = memo(() => <audio id="music-player-global" />)
@@ -379,6 +445,7 @@ const WeatherEffectsSSR = () => {
                   position: 'absolute',
                   top: 0,
                   left: 0,
+                  pointerEvents: 'all',
                   margin: '1rem',
                   animation: 'floating 20s ease-in-out infinite',
                   height: '10rem',
