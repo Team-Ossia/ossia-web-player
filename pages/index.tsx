@@ -42,11 +42,12 @@ const PlayableSong = ({ song }: { song: Song }) => {
         backgroundColor: theme.palette.primary.main,
         transition: 'width .2s ease-in-out',
       },
-      '&:hover:before': {
+      '&:hover:before, &:focus:before': {
         width: 'calc(100% - 3.8rem)',
       },
-      '&:hover': {
+      '&:hover, &:focus': {
         cursor: 'pointer',
+        outline: 'none',
       },
     })}>
     <img style={{
