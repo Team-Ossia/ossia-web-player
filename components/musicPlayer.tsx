@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Song } from "./lastFm";
-import piped from "./piped";
 import { useIsMobile } from "./isMobile";
 import { useRouter } from "next/router";
 
@@ -30,8 +29,6 @@ export const setMediaSession = (song?: Song) => {
         });
     }
 }
-
-const notletters = /[^a-zA-Z0-9áóöőúüű]/g;
 
 export const useMusicPlayer = () => {
     const [playing, setPlaying] = useState(false);
@@ -122,7 +119,7 @@ export const useMusicPlayer = () => {
         const ac = new AbortController();
         if (currentSong && audio) {
             audio.volume = volume;
-            audio.src = `/api/audio?s=${encodeURIComponent(btoa(currentSong.artist.replace(notletters, '').toLowerCase() + " " + currentSong.name.replace(notletters, '').toLowerCase()))}`;
+            audio.src = `/api/audio?a=${currentSong.artist}&t=${currentSong.name}`;
             setMediaSession(currentSong);
             return () => {
                 ac.abort();

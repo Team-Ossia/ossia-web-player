@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import https from 'https';
 
-async function getSpotifyAccessToken() {
+export async function getSpotifyAccessToken() {
     const clientId: string = process.env.SPOTIFY_CLIENT_ID as string;
     const clientSecret: string = process.env.SPOTIFY_CLIENT_SECRET as string;
 

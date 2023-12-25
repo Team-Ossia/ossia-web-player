@@ -1,3 +1,4 @@
+import axios from "axios"
 export const apiroot = "https://pipedapi.kavin.rocks"
 
 export type SearchResponse = {
@@ -25,7 +26,11 @@ export const search = (rb: {
         }
         const params = new URLSearchParams(rb as any).toString()
         let resp
-        try { resp = await (await fetch(`${apiroot}/${np}search?${params}`, { signal: rb.ac?.signal })).json() } catch { resp = {} }
+        try {
+            resp = await axios.get(`${apiroot}/${np}search?${params}`, { signal: rb.ac?.signal }).then(response => response.data);
+        } catch {
+            resp = {};
+        }
         resolve(resp)
     }) as Promise<SearchResponse>
 }
@@ -121,7 +126,7 @@ export const getStreams = (rb: {
     return new Promise(async (resolve, reject) => {
         // leave id out of params
         let resp
-        try { resp = await (await fetch(`${apiroot}/streams/${rb.id}`, { signal: rb.ac?.signal })).json() } catch { resp = {} }
+        try { resp = await axios.get(`${apiroot}/streams/${rb.id}`, { signal: rb.ac?.signal }).then(response => response.data); } catch { resp = {} }
         resolve(resp)
     }) as Promise<StreamsResponse>
 }

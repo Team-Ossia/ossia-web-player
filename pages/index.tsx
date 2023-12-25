@@ -94,14 +94,20 @@ const Home: NextPage = () => {
   const [searchResults, setSearchResults] = useState<Song[] | null>(null)
   const [formTimeout, setFormTimeout] = useState<NodeJS.Timeout | null>(null)
   const [query, setQuery] = useState<string>("")
-  const player = useContext(MusicPlayerContext)
-  const isMobile = useIsMobile()
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [adornmentAttached, setAdornmentAttached] = useState(false)
+
+  useEffect(() => {
+    if (searchLoading) setAdornmentAttached(true)
+  }, [searchLoading])
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('buttons-reload'))
   }, [searchResults])
 
   const search = () => {
+    if(!query) return
+    setSearchLoading(true)
     if (query.length < 1) {
       setSearchResults(null)
       return
@@ -112,6 +118,8 @@ const Home: NextPage = () => {
       } else {
         setSearchResults(null)
       }
+    }).finally(() => {
+      setSearchLoading(false)
     })
   }
 
@@ -153,7 +161,29 @@ const Home: NextPage = () => {
       search()
       return false
     }}>
-      <TextField id='search-input' sx={{
+      <TextField InputProps={{
+        startAdornment: adornmentAttached ? (
+          <AnimatePresence>
+            {searchLoading && <motion.div key='loading'
+              initial={{ width: 0 }}
+              animate={{ width: 'auto' }}
+              exit={{ width: 0 }}
+              style={{
+                overflow: 'hidden',
+              }}
+              onAnimationEnd={() => {
+                if (!searchLoading) setAdornmentAttached(false)
+              }}
+              transition={{ duration: 0.2, type: 'keyframes' }}
+            >
+              <CircularProgress sx={{
+                color: "white",
+                marginRight: '.5rem',
+              }} size={24} />
+            </motion.div>}
+          </AnimatePresence>
+        ) : undefined
+      }} id='search-input' sx={{
         '& label': {
           transition: 'all .2s ease-in-out',
         },
@@ -178,7 +208,7 @@ const Home: NextPage = () => {
         return (<PlayableSong key={`${song.url}`} song={song} />)
       })}
     </Box>
-  </div>;
+  </div >;
 };
 
 export default Home;

@@ -5,20 +5,21 @@ export type Song = {
     name: string,
     artist: string,
     url: string,
-    streamable: string,
-    listeners: string,
-    image: {
-        "#text": string,
-        size: string,
-    }[],
-    mbid: string,
-    pipedStream?: string,
 }
 
 export const querySongs = async (query: string) => {
     // search for a song based on artist name and song name
     const response = await fetch(`${apiRoot}?method=track.search&track=${query}&api_key=${apiKey}&format=json`);
-    const data = await response.json();
+    let data = await response.json();
+    const filteredTracks = await Promise.all(data.results.trackmatches.track.map(async (song: Song) => {
+        // use fetch api to check if the song has artwork, only fetch status code
+        const response = await fetch(`/api/artwork?artist=${song.artist}&title=${song.name}`, {
+            method: 'HEAD',
+        });
+        return response.status === 200;
+    }));
+
+    data.results.trackmatches.track = data.results.trackmatches.track.filter((_: Song, i: number) => filteredTracks[i]);
     return data;
 };
 
