@@ -106,7 +106,7 @@ const Home: NextPage = () => {
   }, [searchResults])
 
   const search = () => {
-    if(!query) return
+    if (!query) return
     setSearchLoading(true)
     if (query.length < 1) {
       setSearchResults(null)
@@ -128,23 +128,21 @@ const Home: NextPage = () => {
     setFormTimeout(setTimeout(search, 500))
   }, [query])
 
-  return <div>
+  return <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+  }}>
     <Box sx={{
       display: 'flex',
       flexDirection: 'column',
       textAlign: 'left',
       flexWrap: 'wrap',
-      gap: '0 2rem',
+      position: 'relative',
       justifyContent: 'center',
+      margin: 'auto',
       alignItems: 'center',
-      "@media (max-width: 480px)": {
-        flexDirection: 'column',
-        textAlign: 'center',
-        '& > svg': {
-          margin: 'auto',
-          marginBottom: '-2rem',
-        }
-      }
     }}>
       <img alt='Ossia Logo' src='/ossia_hero_white.png' style={{
         width: '25rem',
@@ -156,7 +154,9 @@ const Home: NextPage = () => {
       }} />
     </Box>
     <iframe name="hidden" style={{ display: 'none' }} />
-    <form action="#" target='hidden' onSubmit={(e) => {
+    <form style={{
+      width: '100%',
+    }} action="#" target='hidden' onSubmit={(e) => {
       e.preventDefault()
       search()
       return false
@@ -184,6 +184,7 @@ const Home: NextPage = () => {
           </AnimatePresence>
         ) : undefined
       }} id='search-input' sx={{
+        width: '100%',
         '& label': {
           transition: 'all .2s ease-in-out',
         },
@@ -203,6 +204,7 @@ const Home: NextPage = () => {
       display: 'flex',
       flexDirection: 'column',
       gap: '.5rem',
+      width: '100%',
     }}>
       {searchResults && searchResults.map((song, i) => {
         return (<PlayableSong key={`${song.url}`} song={song} />)

@@ -445,10 +445,6 @@ export default function App({ Component, pageProps }: AppProps) {
           "name": "angyal",
           "artist": "luvzee",
           "url": "https://www.last.fm/music/luvzee/_/angyal",
-          "streamable": "FIXME",
-          "listeners": "8",
-          "image": [],
-          "mbid": ""
         })
       }
 
