@@ -60,6 +60,15 @@ export const useMusicPlayer = () => {
     }, [isMobile])
 
     useEffect(() => {
+        if (!audio) return;
+        if (playing) {
+            audio.play()
+        } else {
+            audio.pause()
+        }
+    }, [playing])
+
+    useEffect(() => {
         if (typeof window === 'undefined' || !audio) return;
         const onAudioStart = () => {
             setPlaying(true);
