@@ -7,7 +7,7 @@ import { BottomNavigation, BottomNavigationAction, Box, CircularProgress, Contai
 import { Album, Home, Pause, PlayArrow, Search, Settings } from '@mui/icons-material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { useRouter } from 'next/router';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, delay, motion } from 'framer-motion';
 import { MusicPlayer, useMusicPlayer } from '@/components/musicPlayer';
 import { Wave } from '@/components/wave';
 import { dvh, lvh, svh } from '@/components/units';
@@ -257,7 +257,6 @@ export const ArtworkWaves = () => {
     width: '100vw',
     height: 'calc(100vh - var(--bottom-nav-height))',
     transition: 'opacity .2s ease-in-out',
-    opacity: (player.playing && colors?.start && colors.stop) ? 1 : 0,
     overflow: 'hidden',
     top: 0,
     left: 0,
@@ -292,13 +291,25 @@ export const ArtworkWaves = () => {
         zIndex: -1,
       }} gradient={{ start: colors?.start || "#fff", stop: colors?.stop || "#fff" }} className="wave" />
     </div>
-    <img style={{
-      bottom: 0,
-      right: 0,
-      position: 'absolute',
-      zIndex: -2,
-      filter: `drop-shadow(${defaultShadow.join(" ")})`
-    }} alt='' width={400} height={400} src='/happy_robot.png' />
+    <AnimatePresence>
+      {player.playing && <motion.img
+        //slide up from bottom
+        initial={{
+          bottom: '-100vh'
+        }}
+        animate={{
+          bottom: '0vh',
+        }}
+        exit={{ bottom: '-100vh' }}
+        transition={{ duration: .2, type: 'keyframes', ease: 'easeInOut' }}
+        style={{
+          bottom: 0,
+          right: 0,
+          position: 'absolute',
+          zIndex: -2,
+          filter: `drop-shadow(${defaultShadow.join(" ")})`
+        }} alt='' width={400} height={400} src='/happy_robot.png' />}
+    </AnimatePresence>
   </Box>)
 }
 
