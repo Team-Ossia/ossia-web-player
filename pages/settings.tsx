@@ -105,6 +105,21 @@ const InnerPage = () => {
                         </Box>
                     </motion.div>
                 </Card>
+                <Card variant="outlined" sx={{
+                    width: '100%',
+                    padding: '1rem',
+                    borderRadius: '1rem',
+                }}>
+                    <Typography variant="h4">Credits</Typography>
+                    <Divider style={{ margin: '.5rem 0' }} />
+                    <Typography variant="body1">&quot;Horizon&quot; font by <a target="_blank" href="https://typefaceseger.com/">Köteles Tamás</a></Typography>
+                    <Typography variant="body1">Weather data by <a target="_blank" href="https://open-meteo.com">open-meteo.com</a></Typography>
+                    <Typography variant="body1">Icons and UI by <a target="_blank" href="https://mui.com">mui.com</a></Typography>
+                    <Typography variant="body1">Night background by <a target="_blank" href="https://codepen.io/bennettfeely/">bennettfeely</a></Typography>
+                    <Typography variant="body1">Snowfall by <a target="_blank" href="https://github.com/cahilfoley/react-snowfall">cahilfoley</a></Typography>
+                    <Typography variant="body1">Rainfall by <a target="_blank" href="https://github.com/jason1642/react-rainfall">jason1642</a></Typography>
+                    <Typography variant="body1">Additional information can be found on our <a target="_blank" href="https://github.com/Team-Ossia/ossia-web-player">Github repository</a></Typography>
+                </Card>
             </Box>
         </Container>
     </>)
