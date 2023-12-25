@@ -7,6 +7,8 @@ export type Song = {
     url: string,
 }
 
+const spaceRegex = /[\.\-\_\w]+/gi
+
 export const querySongs = async (query: string) => {
     // search for a song based on artist name and song name
     const response = await fetch(`${apiRoot}?method=track.search&track=${query}&api_key=${apiKey}&format=json`);
@@ -23,7 +25,9 @@ export const querySongs = async (query: string) => {
 
     data.results.trackmatches.track = data.results.trackmatches.track.filter((song: Song, i: number) => {
         // remove duplicates
-        return data.results.trackmatches.track.findIndex((s: Song) => s.name.toLowerCase() === song.name.toLowerCase()) === i;
+        return data.results.trackmatches.track.findIndex((s: Song) =>
+            (s.name.toLowerCase() === song.name.toLowerCase()) && (song.artist.replace(spaceRegex, '_').toLowerCase().includes(s.artist.replace(spaceRegex, '_').toLowerCase()))
+        ) === i;
     });
 
     return data;
