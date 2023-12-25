@@ -11,30 +11,12 @@ import { findMusicAudio } from '@/components/musicPlayer';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const PlayableSong = ({ song }: { song: Song }) => {
-  const [songData, setSongData] = useState<Song>(song)
-  const [loading, setLoading] = useState(false)
-  const isIos = useIsIos()
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    window.dispatchEvent(new CustomEvent('buttons-reload'))
-  }, [songData])
+  const player = useContext(MusicPlayerContext)
 
   return (<Box
-    onClick={isIos ? () => {
-      if (!songData?.pipedStream) {
-        setLoading(true)
-        findMusicAudio(song.artist, song.name).then((url) => {
-          setSongData({
-            ...song,
-            pipedStream: url,
-          })
-        }).finally(() => {
-          setLoading(false)
-        })
-      }
-    } : undefined}
-    data-playbutton={isIos ? JSON.stringify(!!songData?.pipedStream) : "true"} data-song={JSON.stringify(songData)} component="button" key={`${song.url}`} sx={(theme) => ({
+    onClick={() => {
+      player.play(song)
+    }} component="button" key={`${song.url}`} sx={(theme) => ({
       display: 'flex',
       backgroundColor: "transparent",
       textAlign: 'left',
@@ -76,23 +58,6 @@ const PlayableSong = ({ song }: { song: Song }) => {
         padding: '0.4rem',
       }
     })}>
-    <AnimatePresence>
-      {loading && <motion.div
-        key="loading"
-        initial={{ width: 0 }}
-        animate={{ width: "auto" }}
-        exit={{
-          width: 0, transition: {
-            delay: .5,
-          }
-        }}
-        style={{
-          overflow: 'hidden',
-        }}>
-        <CircularProgress />
-      </motion.div>
-      }
-    </AnimatePresence>
     <img style={{
       backgroundColor: "white",
       borderRadius: '0.4rem',

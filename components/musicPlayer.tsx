@@ -49,6 +49,7 @@ export const useMusicPlayer = () => {
     const [volume, setVolume] = useState(0.5);
     const isMobile = useIsMobile()
     const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+    const [pipeLoading, setPipeLoading] = useState(false);
     const router = useRouter()
     const [currentTime, setCurrentTimeState] = useState(0);
 
@@ -80,7 +81,8 @@ export const useMusicPlayer = () => {
             setCurrentSong(null);
             audio.src = "";
         }
-        const onAudioError = () => {
+        const onAudioError = (...e: any[]) => {
+            console.error("Audio error", ...e)
             setPlaying(false);
         }
         const onAudioLoaded = () => {
@@ -107,32 +109,6 @@ export const useMusicPlayer = () => {
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        const handler = (button: Element) => {
-            const song = JSON.parse(button.getAttribute("data-song") || "{}") as Song;
-            play(song);
-        }
-        const updateButtons = () => {
-            const playButtons = document.querySelectorAll('[data-playbutton="true"]')
-            playButtons.forEach((button) => {
-                button.addEventListener("click", () => handler(button))
-            })
-            return () => {
-                playButtons.forEach((button) => {
-                    button.removeEventListener("click", () => handler(button))
-                })
-            }
-        }
-        window.addEventListener("buttons-reload", updateButtons)
-        return () => {
-            window.removeEventListener("buttons-reload", updateButtons)
-            document.querySelectorAll('[data-playbutton="true"]').forEach((button) => {
-                button.removeEventListener("click", () => handler(button))
-            })
-        }
-    }, [])
-
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
         const audio = document.getElementById("music-player-global") as HTMLAudioElement;
         setAudio(audio);
     }, [])
@@ -147,6 +123,8 @@ export const useMusicPlayer = () => {
                 audio.volume = volume;
                 setMediaSession(currentSong);
             } else {
+                if (pipeLoading) return
+                setPipeLoading(true)
                 findMusicAudio(currentSong.artist, currentSong.name, ac)
                     .then((url) => {
                         audio.volume = volume;
@@ -155,6 +133,9 @@ export const useMusicPlayer = () => {
                     })
                     .catch(() => {
                         console.log("Aborted");
+                    })
+                    .finally(() => {
+                        setPipeLoading(false)
                     });
             }
             return () => {
@@ -167,15 +148,6 @@ export const useMusicPlayer = () => {
         if (!audio) return;
         audio.volume = volume;
     }, [volume])
-
-    useEffect(() => {
-        if (!audio) return;
-        if (playing) {
-            audio.play()
-        } else {
-            audio.pause()
-        }
-    }, [playing])
 
     const play = (song: Song) => {
         setCurrentSong(song);
