@@ -310,7 +310,7 @@ export default function App({ Component, pageProps }: AppProps) {
       // PLAY/PAUSE and input not focused
       if (e.key === ' ' && document.activeElement?.tagName !== 'INPUT') {
         e.preventDefault()
-        musicPlayer.playing ? musicPlayer.pause() : musicPlayer.play(musicPlayer.currentSong || musicPlayer.queue[0])
+        musicPlayer.pause()
       }
     }
     window.addEventListener('keydown', hotkeyHandler)
