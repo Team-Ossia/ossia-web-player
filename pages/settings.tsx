@@ -49,7 +49,7 @@ const InnerPage = () => {
                         />
                         <Typography variant="h4">Weather effects</Typography>
                     </Box>
-                    <Typography variant="body1">Day and night cycle, snowfall anf rainfall</Typography>
+                    <Typography variant="body1">Day and night cycle, snowfall and rainfall</Typography>
                     <motion.div
                         style={{
                             overflow: 'hidden',
