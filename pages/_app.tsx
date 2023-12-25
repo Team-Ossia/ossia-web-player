@@ -3,7 +3,7 @@ import '@/styles/starry_night.scss';
 import type { AppProps } from 'next/app'
 import lastFm from '@/components/lastFm';
 import { createContext, createElement, useContext, useEffect, useMemo, useState } from 'react';
-import { BottomNavigation, BottomNavigationAction, Box, Container, CssBaseline, IconButton, SvgIconTypeMap, ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction, Box, CircularProgress, Container, CssBaseline, IconButton, SvgIconTypeMap, ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
 import { Album, Home, Pause, PlayArrow, Search, Settings } from '@mui/icons-material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { useRouter } from 'next/router';
@@ -207,7 +207,7 @@ const NowPlayingWidgetBottom = () => {
                 e.stopPropagation()
                 musicPlayer.pause()
               }}>
-                {musicPlayer.playing ? <Pause /> : <PlayArrow />}
+                {musicPlayer.audioLoading ? <CircularProgress size={30} /> : (musicPlayer.playing ? <Pause /> : <PlayArrow />)}
               </IconButton>
             </Box>
           </Box>

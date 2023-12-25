@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { MusicPlayerContext } from './_app';
 import { useIsIos, useIsMobile } from '@/components/isMobile';
-import { findMusicAudio } from '@/components/musicPlayer';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const PlayableSong = ({ song }: { song: Song }) => {

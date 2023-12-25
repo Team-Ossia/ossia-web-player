@@ -1,5 +1,5 @@
 import { Pause, PlayArrow, SkipNext, SkipPrevious, VolumeDown, VolumeMute, VolumeUp } from "@mui/icons-material";
-import { Box, Button, ButtonGroup, Container, IconButton, Slider, SliderThumb, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, CircularProgress, Container, IconButton, Slider, SliderThumb, Typography } from "@mui/material";
 import type { NextPage } from "next";
 import { createElement, use, useContext, useEffect, useState } from "react";
 import { MusicPlayerContext, defaultShadow } from "./_app";
@@ -137,19 +137,38 @@ const Player: NextPage = () => {
                             <IconButton>
                                 <SkipPrevious fontSize="large" />
                             </IconButton>
-                            <Button onClick={(e) => {
-                                e.stopPropagation()
-                                player.pause()
-                            }} variant="contained" sx={{
-                                borderRadius: '100%',
-                                minWidth: 'unset',
-                                width: '3rem',
-                                height: '3rem',
-                                overflow: 'hidden',
-                                filter: `drop-shadow(${defaultShadow.join(' ')})`,
-                            }}>
-                                {player.playing ? <Pause fontSize="large" /> : <PlayArrow fontSize="large" />}
-                            </Button>
+                            {player.audioLoading ?
+                                <Box sx={(theme) => ({
+                                    borderRadius: '100%',
+                                    minWidth: 'unset',
+                                    width: '3rem',
+                                    height: '3rem',
+                                    overflow: 'hidden',
+                                    backgroundColor: theme.palette.primary.main,
+                                    filter: `drop-shadow(${defaultShadow.join(' ')})`,
+                                    fill: 'white',
+                                    color: 'white',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                })}>
+                                    <CircularProgress size={30} color="inherit" />
+                                </Box>
+                                :
+                                <Button onClick={(e) => {
+                                    e.stopPropagation()
+                                    player.pause()
+                                }} variant="contained" sx={{
+                                    borderRadius: '100%',
+                                    minWidth: 'unset',
+                                    width: '3rem',
+                                    height: '3rem',
+                                    overflow: 'hidden',
+                                    filter: `drop-shadow(${defaultShadow.join(' ')})`,
+                                }}>
+                                    {player.playing ? <Pause fontSize="large" /> : <PlayArrow fontSize="large" />}
+                                </Button>
+                            }
                             <IconButton>
                                 <SkipNext fontSize="large" />
                             </IconButton>

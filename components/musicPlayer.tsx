@@ -6,24 +6,12 @@ import { useRouter } from "next/router";
 
 export type MusicPlayer = {
     playing: boolean,
+    audioLoading: boolean,
     currentSong: Song | null,
     volume: number,
     setVolume: (volume: number) => void,
     play: (song: Song) => void,
     pause: () => void,
-}
-
-export const findMusicAudio = async (artist: string, name: string, ac?: AbortController) => {
-    const resultId = (await (piped.search({
-        filter: 'videos',
-        q: `${artist} ${name}`,
-        ac,
-    }))).items[0].url.split("?v=")[1]
-    const streams = (await piped.getStreams({
-        id: resultId,
-        ac,
-    }))
-    return streams.audioStreams[0].url
 }
 
 export const setMediaSession = (song?: Song) => {
@@ -49,8 +37,8 @@ export const useMusicPlayer = () => {
     const [volume, setVolume] = useState(0.5);
     const isMobile = useIsMobile()
     const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-    const [pipeLoading, setPipeLoading] = useState(false);
     const router = useRouter()
+    const [audioLoading, setAudioLoading] = useState(false);
     const [currentTime, setCurrentTimeState] = useState(0);
 
     useEffect(() => {
@@ -94,7 +82,11 @@ export const useMusicPlayer = () => {
             console.error("Audio error", ...e)
             setPlaying(false);
         }
+        const onLoadStart = () => {
+            setAudioLoading(true);
+        }
         const onAudioLoaded = () => {
+            setAudioLoading(false);
             audio.play();
         }
         const onSongProgress = () => {
@@ -104,6 +96,7 @@ export const useMusicPlayer = () => {
         audio.addEventListener("pause", onAudioPause);
         audio.addEventListener("ended", onAudioEnd);
         audio.addEventListener("error", onAudioError);
+        audio.addEventListener("loadstart", onLoadStart);
         audio.addEventListener("loadeddata", onAudioLoaded);
         audio.addEventListener("timeupdate", onSongProgress);
         return () => {
@@ -111,6 +104,7 @@ export const useMusicPlayer = () => {
             audio.removeEventListener("pause", onAudioPause);
             audio.removeEventListener("ended", onAudioEnd);
             audio.removeEventListener("error", onAudioError);
+            audio.removeEventListener("loadstart", onLoadStart);
             audio.removeEventListener("loadeddata", onAudioLoaded);
             audio.removeEventListener("timeupdate", onSongProgress);
         }
@@ -125,28 +119,9 @@ export const useMusicPlayer = () => {
     useEffect(() => {
         const ac = new AbortController();
         if (currentSong && audio) {
-            audio.volume = 0;
-            setMediaSession();
-            if (currentSong.pipedStream) {
-                audio.src = currentSong.pipedStream;
-                audio.volume = volume;
-                setMediaSession(currentSong);
-            } else {
-                if (pipeLoading) return
-                setPipeLoading(true)
-                findMusicAudio(currentSong.artist, currentSong.name, ac)
-                    .then((url) => {
-                        audio.volume = volume;
-                        audio.src = url;
-                        setMediaSession(currentSong);
-                    })
-                    .catch(() => {
-                        console.log("Aborted");
-                    })
-                    .finally(() => {
-                        setPipeLoading(false)
-                    });
-            }
+            audio.volume = volume;
+            audio.src = `/api/audio?s=${btoa(currentSong.artist + " " + currentSong.name)}`;
+            setMediaSession(currentSong);
             return () => {
                 ac.abort();
             };
@@ -175,6 +150,7 @@ export const useMusicPlayer = () => {
 
     return {
         playing,
+        audioLoading,
         currentSong,
         volume,
         setVolume,
