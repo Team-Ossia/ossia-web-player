@@ -320,6 +320,14 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [musicPlayer])
 
   return (<>
+    <div
+      style={{
+        display: 'none',
+      }}
+    >
+      <h1>Ossia | Music at your fingertips</h1>
+      <h2>A free alternative to music streaming, Ossia adapts to the music and your environment</h2>
+    </div>
     <audio id="music-player-global" />
     <MusicPlayerContext.Provider value={musicPlayer}>
       <ArtworkWaves />

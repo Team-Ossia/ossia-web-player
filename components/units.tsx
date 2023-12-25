@@ -1,5 +1,5 @@
 export const dvh = (number: number) => {
-    if (typeof window === 'undefined') return `${number}vh`
+    if (typeof window === 'undefined') return `${number}dvh`
     //check if css supports dvh
     if (CSS.supports('height', '100dvh')) {
         return `${number}dvh`
@@ -9,7 +9,7 @@ export const dvh = (number: number) => {
 }
 
 export const svh = (number: number) => {
-    if (typeof window === 'undefined') return `${number}vh`
+    if (typeof window === 'undefined') return `${number}svh`
     //check if css supports dvh
     if (CSS.supports('height', '100svh')) {
         return `${number}svh`
@@ -19,7 +19,7 @@ export const svh = (number: number) => {
 }
 
 export const lvh = (number: number) => {
-    if (typeof window === 'undefined') return `${number}vh`
+    if (typeof window === 'undefined') return `${number}lvh`
     //check if css supports dvh
     if (CSS.supports('height', '100lvh')) {
         return `${number}lvh`

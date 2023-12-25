@@ -41,6 +41,34 @@ and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation
   </>)
 }
 
+export const OpenGraph = ({ title, description, imageUrl, domain }: {
+  title?: string,
+  description?: string,
+  imageUrl?: string,
+  domain?: string,
+}) => {
+  return (
+    <>
+      <title>{title}</title>
+      <meta name="description" content={description} />
+
+      <meta property="og:url" content={`https://${domain}`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={imageUrl} />
+
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta property="twitter:domain" content={domain} />
+      <meta property="twitter:url" content={`https://${domain}`} />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={imageUrl} />
+    </>
+  )
+}
+
+
 export default function Document() {
   return (
     <Html lang="hu">
@@ -48,9 +76,15 @@ export default function Document() {
         <meta name="theme-color" content="#8B00FF" />
         <link rel="icon" href="/ossia_logo.png" />
         <link rel="manifest" href="/manifest.json" />
+        <PWAStuff />
+        <OpenGraph
+          title="Ossia | Music at your fingertips"
+          description="A free alternative to Spotify, Ossia adapts to the music and your environment."
+          imageUrl="/og_preview.png"
+          domain="ossia.shie1bi.hu"
+        />
       </Head>
       <body>
-        <title>Ossia Music</title>
         <Main />
         <NextScript />
       </body>
