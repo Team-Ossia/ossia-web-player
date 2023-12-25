@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Song } from "./lastFm";
 import piped from "./piped";
 import { useIsMobile } from "./isMobile";
+import { useRouter } from "next/router";
 
 export type MusicPlayer = {
     playing: boolean,
@@ -61,6 +62,7 @@ export const useMusicPlayer = () => {
     const [volume, setVolume] = useState(0.5);
     const isMobile = useIsMobile()
     const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+    const router = useRouter()
 
     useEffect(() => {
         if (isMobile) {
@@ -77,6 +79,16 @@ export const useMusicPlayer = () => {
             setPlaying(false);
         }
         const onAudioEnd = () => {
+            if (router.pathname.startsWith("/player")) {
+                router.push("/")
+                setTimeout(() => {
+                    setPlaying(false);
+                    setCurrentSong(null);
+                    audio.src = "";
+                    next();
+                }, 450)
+                return;
+            };
             setPlaying(false);
             setCurrentSong(null);
             audio.src = "";
