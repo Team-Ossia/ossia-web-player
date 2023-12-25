@@ -32,7 +32,7 @@ const theme = createTheme({
       main: '#8b00ff', // Violet color
     },
     secondary: {
-      main: '#ff5722', // Orange color
+      main: '#C2A32B', // Yellow color
     },
     background: {
       paper: '#1e1e1e', // Dark grey color for paper background
