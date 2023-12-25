@@ -22,6 +22,7 @@ export default function handler(
             res.status(404).json({ error: 'No results found' })
             return
         }
+        const videoID = results.items[0].url.split('?v=')[1]
 
         const streams = await piped.getStreams({
             id: results.items[0].url.split('?v=')[1],
@@ -49,6 +50,7 @@ export default function handler(
         res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         res.setHeader('Access-Control-Max-Age', '86400');
+        res.setHeader('X-VideoID', videoID);
         if (stream.contentLength) {
             res.setHeader('Content-Length', stream.contentLength);
             res.setHeader('Accept-Ranges', 'bytes');

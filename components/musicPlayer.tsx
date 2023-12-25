@@ -1,4 +1,4 @@
-import { use, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Song } from "./lastFm";
 import { useIsMobile } from "./isMobile";
 import { useRouter } from "next/router";
@@ -96,8 +96,6 @@ export const useMusicPlayer = () => {
         audio.addEventListener("error", onAudioError);
         audio.addEventListener("loadstart", onLoadStart);
         audio.addEventListener("loadeddata", onAudioLoaded);
-        audio.addEventListener("waiting", onLoadStart);
-        audio.addEventListener("stalled", onLoadStart);
         return () => {
             audio.removeEventListener("play", onAudioStart);
             audio.removeEventListener("pause", onAudioPause);

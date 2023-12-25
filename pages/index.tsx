@@ -45,17 +45,9 @@ const PlayableSong = ({ song }: { song: Song }) => {
       '&:hover:before': {
         width: 'calc(100% - 3.8rem)',
       },
-      '&:focus:before': {
-        width: '100%',
-      },
       '&:hover': {
         cursor: 'pointer',
       },
-      '&:focus': {
-        borderColor: theme.palette.primary.main,
-        outline: 'none',
-        padding: '0.4rem',
-      }
     })}>
     <img style={{
       backgroundColor: "white",
