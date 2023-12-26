@@ -8,6 +8,7 @@ import PiPWindow, { usePiPWindow } from "./pip";
 import { AnimatePresence, motion } from 'framer-motion';
 import lastFm from "./lastFm";
 import { GlobalContextMenu } from "./contextMenu";
+import { useIsMobile } from "./isMobile";
 
 export const QuickMenu = () => {
     const player = useContext(MusicPlayerContext);
@@ -173,6 +174,7 @@ export const QuickMenu = () => {
                 flexDirection: 'column',
                 textAlign: 'center',
                 textShadow: "0px 0px 10px rgba(0,0,0,0.8)",
+                padding: '0 1rem',
             }}>
                 <Typography variant="h4" sx={{
                     fontWeight: 'bold',
@@ -235,19 +237,23 @@ export const QuickMenu = () => {
 }
 
 export const PiPInner = () => {
-    const player = useContext(MusicPlayerContext);
-    const router = useRouter();
     const [contextMenuPos, setContextMenuPos] = useState({ x: -1, y: -1 });
+    const isMobile = useIsMobile()
 
     const { isSupported, requestPipWindow, pipWindow, closePipWindow } =
         usePiPWindow();
 
     useEffect(() => {
-        window.oncontextmenu = (e) => {
+        const handler = (e: MouseEvent) => {
+            if (isMobile) return;
             e.preventDefault();
             setContextMenuPos({ x: e.clientX, y: e.clientY })
         }
-    }, [])
+        window.addEventListener('contextmenu', handler)
+        return () => {
+            window.removeEventListener('contextmenu', handler)
+        }
+    }, [isMobile])
 
     return (<>
         <GlobalContextMenu x={contextMenuPos.x} y={contextMenuPos.y} />

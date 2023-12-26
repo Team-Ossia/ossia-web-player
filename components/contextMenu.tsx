@@ -12,7 +12,7 @@ export const GlobalContextMenu = ({ x, y }: {
 
 }) => {
     const [focused, setFocused] = useState(false)
-    const { requestPipWindow, closePipWindow } = usePiPWindow()
+    const { requestPipWindow, closePipWindow, pipWindow } = usePiPWindow()
     const menuRef = useRef<any>(null)
 
     const startPiP = useCallback(() => {
@@ -71,7 +71,8 @@ export const GlobalContextMenu = ({ x, y }: {
                         }
                     }} ref={menuRef}>
                         <MenuItem onClick={() => {
-                            startPiP()
+                            if (pipWindow) closePipWindow()
+                            else startPiP()
                         }}>
                             <ListItemIcon>
                                 <PhoneAndroid fontSize="small" />
