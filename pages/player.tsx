@@ -201,7 +201,7 @@ const Player: NextPage = () => {
                             setSeeking(true)
                         }} onMouseUp={() => {
                             player.seek(seekbar)
-                        }} step={.1} size="medium" min={0} max={player.duration} value={seeking ? seekbar : player.currentTime} sx={{
+                        }} step={.1} size="medium" min={0} max={player.duration || 100} value={seeking ? seekbar : player.currentTime} sx={{
                             width: '100%',
                             marginTop: '.5rem',
                             '& > span.MuiSlider-thumb': {
