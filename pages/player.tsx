@@ -187,28 +187,36 @@ const Player: NextPage = () => {
                             </IconButton>
                         </Box>
                     </Box>
-                    <Slider onChange={(e, v) => {
-                        setSeekbar(v as number)
-                    }} onMouseDown={() => {
-                        setSeeking(true)
-                    }} onMouseUp={() => {
-                        player.seek(seekbar)
-                    }} step={.1} size="medium" min={0} max={player.duration} value={seeking ? seekbar : player.currentTime} sx={{
+                    <div style={{
                         width: '100%',
                         maxWidth: 470,
-                        marginTop: '.5rem',
-                        '& > span.MuiSlider-thumb': {
-                            transition: 'transform .2s ease-in-out',
-                        },
-                        '& > span.MuiSlider-track': {
-                            transition: 'background-color .2s ease-in-out',
-                            backgroundColor: seeking ? 'rgba(255,255,255,.8)' : 'rgba(255,255,255,.4)',
-                        },
-                        '& > span.MuiSlider-rail': {
-                            transition: 'background-color .2s ease-in-out',
-                            backgroundColor: seeking ? 'rgba(255,255,255,.8)' : 'rgba(255,255,255,.4)',
-                        },
-                    }} />
+                    }} onTouchStart={() => {
+                        setSeeking(true)
+                    }} onTouchEnd={() => {
+                        player.seek(seekbar)
+                    }}>
+                        <Slider onChange={(e, v) => {
+                            setSeekbar(v as number)
+                        }} onMouseDown={() => {
+                            setSeeking(true)
+                        }} onMouseUp={() => {
+                            player.seek(seekbar)
+                        }} step={.1} size="medium" min={0} max={player.duration} value={seeking ? seekbar : player.currentTime} sx={{
+                            width: '100%',
+                            marginTop: '.5rem',
+                            '& > span.MuiSlider-thumb': {
+                                transition: 'transform .2s ease-in-out',
+                            },
+                            '& > span.MuiSlider-track': {
+                                transition: 'background-color .2s ease-in-out',
+                                backgroundColor: seeking ? 'rgba(255,255,255,.8)' : 'rgba(255,255,255,.4)',
+                            },
+                            '& > span.MuiSlider-rail': {
+                                transition: 'background-color .2s ease-in-out',
+                                backgroundColor: seeking ? 'rgba(255,255,255,.8)' : 'rgba(255,255,255,.4)',
+                            },
+                        }} />
+                    </div>
                 </Box>
             }
         </Container>
