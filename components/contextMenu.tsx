@@ -58,7 +58,7 @@ export const GlobalContextMenu = ({ x, y }: {
                             paddingTop: 0,
                             paddingBottom: 0,
                         },
-                        '& li:first-child': {
+                        '& li:first-of-type': {
                             marginTop: '8px',
                         },
                         '& li:last-child': {
