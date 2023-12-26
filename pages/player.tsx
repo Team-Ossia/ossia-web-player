@@ -1,11 +1,12 @@
-import { Pause, PlayArrow, SkipNext, SkipPrevious, VolumeDown, VolumeMute, VolumeUp } from "@mui/icons-material";
+import { Monitor, MonitorOutlined, Pause, PlayArrow, SkipNext, SkipPrevious, VolumeDown, VolumeMute, VolumeUp } from "@mui/icons-material";
 import { Box, Button, ButtonGroup, CircularProgress, Container, IconButton, Slider, SliderThumb, Typography } from "@mui/material";
 import type { NextPage } from "next";
-import { createElement, use, useContext, useEffect, useState } from "react";
+import { createElement, use, useCallback, useContext, useEffect, useState } from "react";
 import { MusicPlayerContext, defaultShadow } from "./_app";
 import { useIsMobile } from "@/components/isMobile";
 import { useRouter } from "next/router";
 import { dvh } from "@/components/units";
+import PiPWindow, { PiPProvider, usePiPWindow } from "@/components/pip";
 
 export const VolumeThumbComponent = (props: any) => {
     const { children, ...other } = props;

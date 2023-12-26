@@ -5,10 +5,16 @@ import { useCookies } from "react-cookie";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { geoSearch } from "@/components/openMeteo";
+import { useIsMobile } from "@/components/isMobile";
 
 const InnerPage = () => {
     //geo manual selection: {lat: number, lon: number, name: string}
-    const [cookies, setCookie] = useCookies(['weatherEffects', 'geolocate-method']);
+    const [cookies, setCookie] = useCookies(['weather-effects', 'geolocate-method', 'pip-enabled']);
+    const isMobile = useIsMobile();
+
+    useEffect(() => {
+        console.log(cookies['pip-enabled'])
+    }, [cookies])
 
     return (<>
         <Container sx={{
@@ -39,9 +45,9 @@ const InnerPage = () => {
                         gap: '.5rem',
                     }}>
                         <Switch
-                            checked={cookies.weatherEffects == true}
+                            checked={cookies["weather-effects"] == true}
                             onChange={(e) => {
-                                setCookie('weatherEffects', e.target.checked.toString(), {
+                                setCookie('weather-effects', e.target.checked.toString(), {
                                     path: '/',
                                     maxAge: 60 * 60 * 24 * 365 * 10,
                                 })
@@ -55,7 +61,7 @@ const InnerPage = () => {
                             overflow: 'hidden',
                         }}
                         animate={{
-                            height: cookies.weatherEffects == true ? 'auto' : 0,
+                            height: cookies["weather-effects"] == true ? 'auto' : 0,
                         }}
                         transition={{
                             duration: .2,
@@ -105,6 +111,26 @@ const InnerPage = () => {
                         </Box>
                     </motion.div>
                 </Card>
+                {!isMobile && <Card variant="outlined" sx={{
+                    width: '100%',
+                    padding: '1rem',
+                    borderRadius: '1rem',
+                }}>
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                        gap: '.5rem',
+                    }}>
+                        <Typography variant="h4">Floating Player <span style={{ fontSize: 18 }}>{"("}Experimental{")"}</span></Typography>
+                    </Box>
+                    <Divider style={{ margin: '.5rem 0' }} />
+                    <Typography variant="body1">Control the music anywhere from your desktop.<br />To open the player, simply select it from the context menu!</Typography>
+                    <Typography style={{
+                        opacity: .7,
+                    }} variant="body2">Known issue: You may have to reopen the window on the first launch </Typography>
+                </Card>}
                 <Card variant="outlined" sx={{
                     width: '100%',
                     padding: '1rem',

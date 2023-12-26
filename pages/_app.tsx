@@ -2,8 +2,8 @@ import '@/styles/globals.css'
 import '@/styles/starry_night.scss';
 import type { AppProps } from 'next/app'
 import lastFm from '@/components/lastFm';
-import { createContext, createElement, memo, useContext, useEffect, useMemo, useState } from 'react';
-import { BottomNavigation, BottomNavigationAction, Box, CircularProgress, Container, CssBaseline, IconButton, SvgIconTypeMap, ThemeProvider, Typography, createTheme, useMediaQuery } from '@mui/material';
+import { createContext, createElement, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { BottomNavigation, BottomNavigationAction, Box, Button, CircularProgress, Container, CssBaseline, IconButton, SvgIconTypeMap, ThemeProvider, Typography, createTheme, useMediaQuery } from '@mui/material';
 import { Album, Home, Pause, PlayArrow, Search, Settings } from '@mui/icons-material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { useRouter } from 'next/router';
@@ -20,6 +20,9 @@ import { useGeo } from '@/components/useGeo';
 import { useWeather } from '@/components/useWeather';
 import { StarryNight } from '@/components/starry_night';
 import { useRoboThought } from '@/components/roboThought';
+import { PiPProvider } from '@/components/pip';
+import { PiPInner } from '@/components/pipper';
+
 
 export const MusicPlayerContext = createContext<MusicPlayer>(null as any);
 
@@ -131,6 +134,7 @@ const PhoneNavbar = () => {
         minWidth: 'unset',
       }} href={page.href} onClick={(e) => {
         e.preventDefault()
+        window.dispatchEvent(new CustomEvent('close-pip'))
         router.push(page.href);
         if (page.extraAction) {
           page.extraAction()
@@ -139,7 +143,7 @@ const PhoneNavbar = () => {
     </BottomNavigation></>)
 }
 
-const NowPlayingWidgetBottom = () => {
+export const NowPlayingWidgetBottom = () => {
   const router = useRouter()
   const musicPlayer = useContext(MusicPlayerContext)
 
@@ -231,6 +235,32 @@ const NowPlayingWidgetBottom = () => {
   </>)
 }
 
+export const SongBG = () => {
+  const player = useContext(MusicPlayerContext);
+  const router = useRouter();
+
+  return (<AnimatePresence>
+    {player.currentSong && <motion.div className='song-bg' key={player.currentSong.url}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: .4, type: 'keyframes' }}
+    ><Box sx={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      width: '100vw',
+      height: "100vh",
+      zIndex: -1,
+      opacity: 0.1,
+      filter: 'blur(10px)',
+      backgroundImage: `url("/api/artwork?artist=${encodeURIComponent(player.currentSong?.artist)}&title=${encodeURIComponent(player.currentSong?.name)}")`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }} /></motion.div>}
+  </AnimatePresence>)
+}
+
 export const ArtworkWaves = () => {
   const player = useContext(MusicPlayerContext);
   const [colors, setColors] = useState<{ start: string, stop: string } | null>(null)
@@ -311,69 +341,71 @@ export const ArtworkWaves = () => {
           zIndex: -2,
         }}
       >
-        <Box
-          sx={{
-            position: 'relative'
-          }}
-        >
-          <AnimatePresence>
-            {robo.display && <motion.div
-              initial={{
-                opacity: 0,
-                scale: 0,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-              }}
-              exit={{
-                opacity: 0,
-                scale: 0,
-              }}
-              transition={{ duration: .2, type: 'keyframes', ease: 'easeInOut' }}
-            >
-              <Box className="thought-bubble"
-                //thought bubble pointing to bottom right
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: 'auto',
-                  transform: 'translate(-50%, -100%)',
-                  backgroundColor: 'rgba(255,255,255,.1)',
-                  borderRadius: '1rem',
-                  zIndex: -1,
-                  filter: `drop-shadow(${defaultShadow.join(" ")})`,
-                  ':after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: '100%',
-                    left: '100%',
-                    width: 20,
-                    height: 20,
-                    borderRadius: 4,
-                  }
-                }}
-              >
-                <Typography variant='body1' sx={{
-                  padding: '1rem',
-                }}>
-                  {robo.thought}
-                </Typography>
-              </Box>
-            </motion.div>}
-          </AnimatePresence>
-          <img
-            style={{
-              filter: `drop-shadow(${defaultShadow.join(" ")})`,
-              height: 400,
-              maxHeight: '50vh',
-              width: 'auto',
-              pointerEvents: 'all',
+        <div className="robo-wrapper">
+          <Box
+            sx={{
+              position: 'relative'
             }}
-            alt='' height={400} src='/happy_robot.png' />
-        </Box>
+          >
+            <AnimatePresence>
+              {robo.display && <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                  scale: 0,
+                }}
+                transition={{ duration: .2, type: 'keyframes', ease: 'easeInOut' }}
+              >
+                <Box className="thought-bubble"
+                  //thought bubble pointing to bottom right
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: 'auto',
+                    transform: 'translate(-50%, -100%)',
+                    backgroundColor: 'rgba(255,255,255,.1)',
+                    borderRadius: '1rem',
+                    zIndex: -1,
+                    filter: `drop-shadow(${defaultShadow.join(" ")})`,
+                    ':after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: '100%',
+                      left: '100%',
+                      width: 20,
+                      height: 20,
+                      borderRadius: 4,
+                    }
+                  }}
+                >
+                  <Typography variant='body1' sx={{
+                    padding: '1rem',
+                  }}>
+                    {robo.thought}
+                  </Typography>
+                </Box>
+              </motion.div>}
+            </AnimatePresence>
+            <img
+              style={{
+                filter: `drop-shadow(${defaultShadow.join(" ")})`,
+                height: 400,
+                maxHeight: '50vh',
+                width: 'auto',
+                pointerEvents: 'all',
+              }}
+              alt='' height={400} src='/happy_robot.png' />
+          </Box>
+        </div>
       </motion.div>}
     </AnimatePresence>
   </Box >)
@@ -382,7 +414,7 @@ export const ArtworkWaves = () => {
 export const MusicPlayerGlobal = memo(() => <audio id="music-player-global" />)
 
 const WeatherEffectsSSR = () => {
-  const [cookies] = useCookies(['weatherEffects'])
+  const [cookies] = useCookies(['weather-effects'])
   const { whatIsFalling, isDay } = useWeather()
   const isMobile = useIsMobile()
   const router = useRouter()
@@ -392,7 +424,7 @@ const WeatherEffectsSSR = () => {
   }, [router.pathname, isMobile, isDay])
 
   return (<AnimatePresence mode='wait'>
-    {cookies.weatherEffects == true &&
+    {cookies["weather-effects"] == true &&
       <motion.div
         key="weather-effects"
         initial={{ opacity: 0 }}
@@ -468,7 +500,7 @@ const WeatherEffects = dynamic(() => Promise.resolve(WeatherEffectsSSR), {
 })
 
 const CookiesHandler = () => {
-  const [cookies, setCookie] = useCookies(['weatherEffects', 'geolocate-method'])
+  const [cookies, setCookie] = useCookies(['weather-effects', 'geolocate-method'])
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -500,12 +532,13 @@ const CookiesHandler = () => {
       })
     }
 
-    if (cookies.weatherEffects === undefined) {
-      setCookie('weatherEffects', true, {
+    if (cookies["weather-effects"] === undefined) {
+      setCookie('weather-effects', true, {
         path: '/',
         maxAge: 60 * 60 * 24 * 365 * 10,
       })
     }
+
   }, [])
 
   return (<></>)
@@ -570,26 +603,7 @@ export default function App({ Component, pageProps }: AppProps) {
       }} className="filters">
         <WeatherEffects />
         <ArtworkWaves />
-        <AnimatePresence>
-          {musicPlayer.currentSong && <motion.div className='song-bg' key={musicPlayer.currentSong.url}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: .4, type: 'keyframes' }}
-          ><Box sx={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            width: '100vw',
-            height: "100vh",
-            zIndex: -1,
-            opacity: 0.1,
-            filter: 'blur(10px)',
-            backgroundImage: `url("/api/artwork?artist=${encodeURIComponent(musicPlayer.currentSong?.artist)}&title=${encodeURIComponent(musicPlayer.currentSong?.name)}")`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }} /></motion.div>}
-        </AnimatePresence>
+        <SongBG />
       </div>
       <ThemeProvider theme={theme}>
         <CssBaseline />
@@ -644,11 +658,20 @@ export default function App({ Component, pageProps }: AppProps) {
               </AnimatePresence>
             </Container>
           </div>
+          <PiPProvider>
+            <PiPInner />
+          </PiPProvider>
           <NowPlayingWidgetBottom />
           <PhoneNavbar />
+          <Box sx={{
+            position: 'fixed',
+            top: 0,
+            right: 0,
+            zIndex: 999999,
+          }}>
+          </Box>
         </div>
       </ThemeProvider>
     </MusicPlayerContext.Provider>
-  </>
-  )
+  </>)
 }
