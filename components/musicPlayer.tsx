@@ -59,15 +59,6 @@ export const useMusicPlayer = () => {
     }, [isMobile])
 
     useEffect(() => {
-        if (!audio) return;
-        if (playing) {
-            audio.play()
-        } else {
-            audio.pause()
-        }
-    }, [playing])
-
-    useEffect(() => {
         if (typeof window === 'undefined' || !audio) return;
         const onAudioStart = () => {
             setPlaying(true);
@@ -153,10 +144,11 @@ export const useMusicPlayer = () => {
     const pause = () => {
         // toggle
         if (playing) {
-            setPlaying(false);
+            audio?.pause();
             return;
         } else if (currentSong) {
-            setPlaying(true);
+            audio?.play();
+            return;
         }
     }
 
