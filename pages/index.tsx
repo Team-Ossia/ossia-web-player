@@ -1,7 +1,7 @@
 import lastFm, { Song } from '@/components/lastFm';
 import { Box, CircularProgress, Divider, TextField, Typography, useTheme } from '@mui/material';
 import type { NextPage } from 'next';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { MusicPlayerContext } from './_app';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -95,23 +95,27 @@ const Home: NextPage = () => {
     window.dispatchEvent(new CustomEvent('buttons-reload'))
   }, [searchResults])
 
-  const search = () => {
+  const search = useCallback(() => {
     if (!query) return
+    const ac = new AbortController()
     setSearchLoading(true)
     if (query.length < 1) {
       setSearchResults(null)
       return
     }
-    lastFm.querySongs(query).then((songs) => {
+    lastFm.querySongs(query, ac).then((songs) => {
       if (songs.results) {
         setSearchResults(songs.results.trackmatches.track)
       } else {
         setSearchResults(null)
       }
-    }).finally(() => {
+    }).catch(() => { }).finally(() => {
       setSearchLoading(false)
     })
-  }
+    return () => {
+      ac.abort()
+    }
+  }, [query])
 
   useEffect(() => {
     if (formTimeout) clearTimeout(formTimeout)
