@@ -1,10 +1,21 @@
-import { Autocomplete, Box, Card, Container, Divider, FormControl, FormControlLabel, FormLabel, Paper, Radio, RadioGroup, Switch, TextField, Typography } from "@mui/material";
+import {
+    Box,
+    Card,
+    Container,
+    Divider,
+    FormControl,
+    FormControlLabel,
+    FormLabel,
+    Radio,
+    RadioGroup,
+    Switch,
+    Typography,
+} from "@mui/material";
 import type { NextPage } from "next";
-import { motion, useForceUpdate } from 'framer-motion'
+import { motion } from 'framer-motion';
 import { useCookies } from "react-cookie";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import dynamic from "next/dynamic";
-import { geoSearch } from "@/components/openMeteo";
 import { useIsMobile } from "@/components/isMobile";
 
 const InnerPage = () => {

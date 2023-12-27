@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Song } from "./lastFm";
 import { useIsMobile } from "./isMobile";
 import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
+import { MusicPlayerContext } from "@/pages/_app";
 
 export type MusicPlayer = {
-    context: AudioContext | null;
     playing: boolean;
     audioLoading: boolean;
     currentSong: Song | null;
+    colors: string[];
     volume: number;
     currentTime: number;
     duration: number;
@@ -17,6 +18,8 @@ export type MusicPlayer = {
     play: (song: Song) => void;
     pause: () => void;
     seek: (time: number) => void;
+    context: AudioContext | null;
+    analyser: AnalyserNode | null;
 }
 
 export const setMediaSession = (song?: Song) => {
@@ -49,8 +52,31 @@ export const useMusicPlayer = () => {
         if (duration === 0) return 0;
         return currentTime / duration;
     }, [currentTime, duration])
+    const [colors, setColors] = useState<string[]>([]);
+    // const colors = useMemo(async () => {
+    //     if (typeof window === 'undefined') return [];
+    //     const resp = (await fetch(`/api/artwork?artist=${encodeURIComponent(currentSong?.artist || "laurie.")}&title=${encodeURIComponent(currentSong?.name || "pára")}`, {
+    //         method: "HEAD",
+    //     }))
+    //     const colors = resp.headers.get("X-Colors")?.split(",") || [];
+    //     console.log(colors)
+    //     return colors;
+    // }, [currentSong])
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        if (!currentSong) {
+            return;
+        };
+        fetch(`/api/artwork?artist=${encodeURIComponent(currentSong.artist)}&title=${encodeURIComponent(currentSong.name)}`, {
+            method: "HEAD",
+        }).then(resp => {
+            setColors(resp.headers.get("X-Colors")?.split(",") || []);
+        })
+    }, [currentSong])
 
     const gainNode = useRef<GainNode | null>(null);
+    const analyser = useRef<AnalyserNode | null>(null);
 
     const audio = useMemo(() => {
         if (typeof window === 'undefined') return null;
@@ -61,10 +87,12 @@ export const useMusicPlayer = () => {
         const aucon = new AudioContext();
         const source = aucon.createMediaElementSource(audio);
         gainNode.current = aucon.createGain();
+        analyser.current = aucon.createAnalyser();
         source.connect(gainNode.current);
-        gainNode.current.connect(aucon.destination);
+        gainNode.current.connect(analyser.current);
+        analyser.current.connect(aucon.destination);
         return aucon;
-    }, [audio, gainNode])
+    }, [audio, gainNode, analyser])
 
     useEffect(() => {
         if (isMobile) {
@@ -168,10 +196,10 @@ export const useMusicPlayer = () => {
     }
 
     return {
-        context,
         playing,
         audioLoading,
         currentSong,
+        colors,
         volume,
         currentTime,
         duration,
@@ -180,5 +208,7 @@ export const useMusicPlayer = () => {
         play,
         pause,
         seek,
+        context,
+        analyser: analyser.current,
     }
 }

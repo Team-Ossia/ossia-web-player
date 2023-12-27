@@ -1,12 +1,20 @@
-import { Monitor, MonitorOutlined, Pause, PlayArrow, SkipNext, SkipPrevious, VolumeDown, VolumeMute, VolumeUp } from "@mui/icons-material";
-import { Box, Button, ButtonGroup, CircularProgress, Container, IconButton, Slider, SliderThumb, Typography } from "@mui/material";
+import { Pause, PlayArrow, SkipNext, SkipPrevious } from "@mui/icons-material";
+import {
+    Box,
+    Button,
+    CircularProgress,
+    Container,
+    IconButton,
+    Slider,
+    SliderThumb,
+    Typography,
+} from "@mui/material";
 import type { NextPage } from "next";
-import { createElement, use, useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { MusicPlayerContext, defaultShadow } from "./_app";
 import { useIsMobile } from "@/components/isMobile";
 import { useRouter } from "next/router";
 import { dvh } from "@/components/units";
-import PiPWindow, { PiPProvider, usePiPWindow } from "@/components/pip";
 
 export const VolumeThumbComponent = (props: any) => {
     const { children, ...other } = props;
@@ -68,8 +76,8 @@ const Player: NextPage = () => {
                             position: 'relative',
                             display: 'flex',
                             justifyContent: 'center',
+                            flexDirection: 'column',
                             alignItems: 'center',
-                            flexDirection: 'row',
                         }}>
                             <Box sx={{
                                 position: 'relative',
@@ -81,7 +89,7 @@ const Player: NextPage = () => {
                                 },
                             }}>
                                 <img draggable={false} style={{
-                                    borderRadius: '.4rem .4rem 0 0',
+                                    borderRadius: '0 0 .4rem .4rem',
                                     boxShadow: `${defaultShadow[0]} ${defaultShadow[1]} ${defaultShadow[2]} rgba(0,0,0,.4)`,
                                     overflow: 'hidden',
                                     maxWidth: '50vmin',

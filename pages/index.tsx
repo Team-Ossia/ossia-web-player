@@ -1,12 +1,8 @@
 import lastFm, { Song } from '@/components/lastFm';
-import { MusicNote, Search } from '@mui/icons-material';
-import { Box, Button, CircularProgress, Divider, FormControl, IconButton, TextField, Typography, useTheme } from '@mui/material';
+import { Box, CircularProgress, Divider, TextField, Typography, useTheme } from '@mui/material';
 import type { NextPage } from 'next';
-import Image from 'next/image';
-import { useRouter } from 'next/router';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { MusicPlayerContext } from './_app';
-import { useIsIos, useIsMobile } from '@/components/isMobile';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const PlayableSong = ({ song }: { song: Song }) => {

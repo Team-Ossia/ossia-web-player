@@ -2,27 +2,46 @@ import '@/styles/globals.css'
 import '@/styles/starry_night.scss';
 import type { AppProps } from 'next/app'
 import lastFm from '@/components/lastFm';
-import { createContext, createElement, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { BottomNavigation, BottomNavigationAction, Box, Button, CircularProgress, Container, CssBaseline, IconButton, SvgIconTypeMap, ThemeProvider, Typography, createTheme, useMediaQuery } from '@mui/material';
-import { Album, Home, Pause, PlayArrow, Search, Settings } from '@mui/icons-material';
+import {
+  createContext,
+  createElement,
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import {
+  BottomNavigation,
+  BottomNavigationAction,
+  Box,
+  CircularProgress,
+  Container,
+  CssBaseline,
+  IconButton,
+  SvgIconTypeMap,
+  ThemeProvider,
+  Typography,
+  createTheme,
+  useMediaQuery,
+} from '@mui/material';
+import { Pause, PlayArrow, Search, Settings } from '@mui/icons-material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { useRouter } from 'next/router';
-import { AnimatePresence, delay, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { MusicPlayer, useMusicPlayer } from '@/components/musicPlayer';
 import { Wave } from '@/components/wave';
-import { dvh, lvh, svh } from '@/components/units';
+import { dvh } from '@/components/units';
 import { useIsMobile } from '@/components/isMobile';
 import Snowfall from 'react-snowfall';
 import { Rain } from 'react-rainfall';
 import { useCookies } from 'react-cookie';
 import dynamic from 'next/dynamic';
-import { useGeo } from '@/components/useGeo';
 import { useWeather } from '@/components/useWeather';
 import { StarryNight } from '@/components/starry_night';
 import { useRoboThought } from '@/components/roboThought';
 import { PiPProvider } from '@/components/pip';
 import { PiPInner } from '@/components/pipper';
-
 
 export const MusicPlayerContext = createContext<MusicPlayer>(null as any);
 
@@ -263,25 +282,12 @@ export const SongBG = () => {
 
 export const ArtworkWaves = () => {
   const player = useContext(MusicPlayerContext);
-  const [colors, setColors] = useState<{ start: string, stop: string } | null>(null)
+  const colors = useMemo(() => ({
+    start: player.colors[0] || "#000000",
+    stop: player.colors[1] || "#000000",
+  }), [player.colors])
+  console.log(player.colors)
   const robo = useRoboThought()
-
-  useEffect(() => {
-    let ac = new AbortController();
-    fetch(`/api/getSongColors?artist=${encodeURIComponent(player.currentSong?.artist || "laurie.")}&title=${encodeURIComponent(player.currentSong?.name || "pára")}`, {
-      signal: ac.signal,
-    }).then((res) => res.json()).then((colors: string[]) => {
-      setColors({
-        start: colors[0],
-        stop: colors[1],
-      })
-    }).catch(() => {
-      setColors(null)
-    })
-    return () => {
-      ac.abort();
-    }
-  }, [player.currentSong])
 
   return (<Box sx={{
     content: '""',
@@ -324,7 +330,7 @@ export const ArtworkWaves = () => {
       }} gradient={{ start: colors?.start || "#fff", stop: colors?.stop || "#fff" }} className="wave" />
     </div>
     <AnimatePresence>
-      {player.playing && <motion.div
+      {(player.playing && (player.colors.length > 0)) && <motion.div
         //slide up from bottom
         initial={{
           bottom: '-100vh'
@@ -597,9 +603,16 @@ export default function App({ Component, pageProps }: AppProps) {
       <h1>Ossia | Music at your fingertips</h1>
       <h2>A free alternative to music streaming, Ossia adapts to the music and your environment</h2>
     </div>
-    <MusicPlayerContext.Provider value={musicPlayer}>
+    <MusicPlayerContext.Provider value={musicPlayer as any}>
       <div style={{
         pointerEvents: 'none',
+        zIndex: -1,
+        position: 'fixed',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        overflow: 'hidden',
       }} className="filters">
         <WeatherEffects />
         <ArtworkWaves />

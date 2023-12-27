@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import https from 'https';
+import getColors from 'get-image-colors'
 
 export async function getSpotifyAccessToken() {
     const clientId: string = process.env.SPOTIFY_CLIENT_ID as string;
@@ -71,14 +72,23 @@ export default async function handler(
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         res.setHeader('Access-Control-Max-Age', '86400');
 
-        // Download image with https.get and pipe it to the response, awaiting the result
-        await new Promise((resolve, reject) => {
+        // Download image with https.get and store it 
+        return new Promise<void>((resolve, reject) => {
             https.get(image, (response) => {
-                response.pipe(res);
-                response.on('end', resolve);
-                response.on('error', reject);
+                const data: Uint8Array[] = [];
+                response.on('data', (chunk) => {
+                    data.push(chunk);
+                });
+
+                response.on('end', () => {
+                    const buffer = Buffer.concat(data);
+                    getColors(buffer, 'image/jpeg').then(colors => {
+                        res.setHeader('X-Colors', colors.map(color => color.hex()).join(','));
+                        res.status(200).send(buffer);
+                    })
+                });
             });
-        });
+        })
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
