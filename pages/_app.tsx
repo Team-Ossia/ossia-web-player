@@ -626,16 +626,11 @@ export default function App({ Component, pageProps }: AppProps) {
           gap: 0,
           justifyContent: 'space-between',
         }}>
-          <div style={{
-            overflowY: 'auto',
-          }}>
+          <div className='scroll-y'>
             <Container sx={{
               marginBottom: '1rem',
               marginTop: '1rem',
               position: 'relative',
-              '& *': {
-                overflowY: 'hidden',
-              }
             }}>
               <AnimatePresence mode='wait'>
                 <motion.div key={router.route}
@@ -660,13 +655,13 @@ export default function App({ Component, pageProps }: AppProps) {
                   }}
                   style={{ overflow: 'hidden' }}
                   transition={{ duration: .3, type: 'keyframes' }}
-                  initial={{ translateX: '100%' }}
+                  initial={{ transform: 'translateX(100%)' }}
                   animate={{
-                    translateX: '0%',
+                    transform: 'translateX(0%)',
                     paddingBottom: (musicPlayer.currentSong && !router.pathname.startsWith("/player")) ? 'calc(var(--bottom-nav-height) * 1.5)' : '0',
                     marginBottom: isMobile ? 'calc(var(--bottom-nav-height) + 1rem)' : '0',
                   }}
-                  exit={{ translateX: '-100%' }}
+                  exit={{ transform: 'translateX(-100%)' }}
                 >
                   <Component {...pageProps} />
                 </motion.div>

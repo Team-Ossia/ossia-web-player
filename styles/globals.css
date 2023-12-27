@@ -25,6 +25,7 @@
 }
 
 @keyframes swell {
+
   0%,
   100% {
     transform: translate3d(0, -25px, 0);
@@ -118,5 +119,54 @@ img::after {
 }
 
 .css-jymg5i-MuiSlider-root {
-  padding: 0;
+  padding: 0px;
+}
+
+/* invisible scrollbar */
+*::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: transparent;
+}
+
+/* custom dark scrollbar */
+.scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.scroll-y {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.scroll-x::-webkit-scrollbar,
+.scroll-y::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scroll-x::-webkit-scrollbar-track,
+.scroll-y::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.scroll-x::-webkit-scrollbar-thumb,
+.scroll-y::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.scroll-x::-webkit-scrollbar-thumb:hover,
+.scroll-y::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
