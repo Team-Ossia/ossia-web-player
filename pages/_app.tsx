@@ -286,7 +286,6 @@ export const ArtworkWaves = () => {
     start: player.colors[0] || "#000000",
     stop: player.colors[1] || "#000000",
   }), [player.colors])
-  console.log(player.colors)
   const robo = useRoboThought()
 
   return (<Box sx={{

@@ -53,15 +53,6 @@ export const useMusicPlayer = () => {
         return currentTime / duration;
     }, [currentTime, duration])
     const [colors, setColors] = useState<string[]>([]);
-    // const colors = useMemo(async () => {
-    //     if (typeof window === 'undefined') return [];
-    //     const resp = (await fetch(`/api/artwork?artist=${encodeURIComponent(currentSong?.artist || "laurie.")}&title=${encodeURIComponent(currentSong?.name || "pára")}`, {
-    //         method: "HEAD",
-    //     }))
-    //     const colors = resp.headers.get("X-Colors")?.split(",") || [];
-    //     console.log(colors)
-    //     return colors;
-    // }, [currentSong])
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
