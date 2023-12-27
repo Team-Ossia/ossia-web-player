@@ -12,7 +12,7 @@ export const GlobalContextMenu = ({ x, y }: {
 
 }) => {
     const [focused, setFocused] = useState(false)
-    const { requestPipWindow, closePipWindow, pipWindow } = usePiPWindow()
+    const { requestPipWindow, closePipWindow, pipWindow, isSupported } = usePiPWindow()
     const menuRef = useRef<any>(null)
 
     const startPiP = useCallback(() => {
@@ -70,7 +70,7 @@ export const GlobalContextMenu = ({ x, y }: {
                             outline: 'none',
                         }
                     }} ref={menuRef}>
-                        <MenuItem onClick={() => {
+                        {isSupported && <MenuItem onClick={() => {
                             if (pipWindow) closePipWindow()
                             else startPiP()
                         }}>
@@ -81,7 +81,7 @@ export const GlobalContextMenu = ({ x, y }: {
                             <Typography variant="body2" color="text.secondary">
                                 (Experimental)
                             </Typography>
-                        </MenuItem>
+                        </MenuItem>}
                     </MenuList>
                 </Paper>
             </motion.div>}

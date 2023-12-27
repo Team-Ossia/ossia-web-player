@@ -122,26 +122,6 @@ const InnerPage = () => {
                         </Box>
                     </motion.div>
                 </Card>
-                {!isMobile && <Card variant="outlined" sx={{
-                    width: '100%',
-                    padding: '1rem',
-                    borderRadius: '1rem',
-                }}>
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',
-                        gap: '.5rem',
-                    }}>
-                        <Typography variant="h4">Floating Player <span style={{ fontSize: 18 }}>{"("}Experimental{")"}</span></Typography>
-                    </Box>
-                    <Divider style={{ margin: '.5rem 0' }} />
-                    <Typography variant="body1">Control the music anywhere from your desktop.<br />To open the player, simply select it from the context menu!</Typography>
-                    <Typography style={{
-                        opacity: .7,
-                    }} variant="body2">Known issue: You may have to reopen the window on the first launch </Typography>
-                </Card>}
                 <Card variant="outlined" sx={{
                     width: '100%',
                     padding: '1rem',

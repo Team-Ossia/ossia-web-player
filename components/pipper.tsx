@@ -1,46 +1,19 @@
-import { ArtworkWaves, MusicPlayerContext, NowPlayingWidgetBottom, SongBG, defaultShadow } from "@/pages/_app";
-import Player, { VolumeThumbComponent } from "@/pages/player";
-import { Monitor, MonitorOutlined, SkipPrevious, Pause, PlayArrow, SkipNext, Close, PhoneAndroid, Search, ArrowDropDown, ArrowDropUp, Phone } from "@mui/icons-material";
-import { IconButton, Slider, Typography, CircularProgress, Button, Box, BottomNavigation, TextField, BottomNavigationAction } from "@mui/material";
-import { useRouter } from "next/router";
-import { useContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import PiPWindow, { usePiPWindow } from "./pip";
+import { ArtworkWaves, MusicPlayerContext } from "@/pages/_app";
+import { SkipPrevious, Pause, PlayArrow, SkipNext, Close, Search } from "@mui/icons-material";
+import { IconButton, Typography, Button, Box, BottomNavigation, TextField } from "@mui/material";
+import { useContext, useEffect, useRef, useState } from "react";
+import PiPWindow, { PiPContextType, usePiPWindow } from "./pip";
 import { AnimatePresence, motion } from 'framer-motion';
 import lastFm from "./lastFm";
 import { GlobalContextMenu } from "./contextMenu";
 import { useIsMobile } from "./isMobile";
 
-export const QuickMenu = () => {
+export const QuickMenuInner = ({ pip }: {
+    pip?: PiPContextType
+}) => {
     const player = useContext(MusicPlayerContext);
-    const { closePipWindow, pipWindow } = usePiPWindow();
     const [focused, setFocused] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        if (!pipWindow) return;
-        //shortcuts
-        const handler = (e: KeyboardEvent) => {
-            if (pipWindow.document.activeElement?.tagName === 'INPUT') return;
-            //space
-            if (e.key === ' ') {
-                player.pause();
-            }
-            //esc
-            if (e.key === 'Escape') {
-                closePipWindow();
-            }
-            //ctrl + k or s
-            if ((e.ctrlKey && e.key === 'k') || e.key === 's') {
-                setTimeout(() => {
-                    setFocused(true);
-                }, 100)
-            }
-        }
-        pipWindow.addEventListener('keydown', handler)
-        return () => {
-            pipWindow.removeEventListener('keydown', handler)
-        }
-    }, [pipWindow, player, closePipWindow])
 
     useEffect(() => {
         if (!inputRef.current) return;
@@ -222,7 +195,7 @@ export const QuickMenu = () => {
                 zIndex: 3,
             }}>
                 <IconButton onClick={() => {
-                    closePipWindow()
+                    pip?.closePipWindow()
                 }}>
                     <Close fontSize="large" />
                 </IconButton>
@@ -234,6 +207,43 @@ export const QuickMenu = () => {
             </BottomNavigation >
         </Box>
     </>)
+}
+
+export const QuickMenu = () => {
+    const player = useContext(MusicPlayerContext);
+
+    const pip = usePiPWindow();
+    const { pipWindow, closePipWindow } = pip;
+
+    useEffect(() => {
+        if (!pipWindow) return;
+        //shortcuts
+        const handler = (e: KeyboardEvent) => {
+            if (pipWindow.document.activeElement?.tagName === 'INPUT') return;
+            //space
+            if (e.key === ' ') {
+                player.pause();
+            }
+            //esc
+            if (e.key === 'Escape') {
+                closePipWindow();
+            }
+            //ctrl + k or s
+            if ((e.ctrlKey && e.key === 'k') || e.key === 's') {
+                setTimeout(() => {
+                    pipWindow?.document.querySelector('input')?.focus();
+                }, 100)
+            }
+        }
+        pipWindow.addEventListener('keydown', handler)
+        return () => {
+            pipWindow.removeEventListener('keydown', handler)
+        }
+    }, [pipWindow, player, closePipWindow])
+
+
+
+    return (<QuickMenuInner pip={pip} />)
 }
 
 export const PiPInner = () => {

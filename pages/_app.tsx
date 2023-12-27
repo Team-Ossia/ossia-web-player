@@ -41,7 +41,7 @@ import { useWeather } from '@/components/useWeather';
 import { StarryNight } from '@/components/starry_night';
 import { useRoboThought } from '@/components/roboThought';
 import { PiPProvider } from '@/components/pip';
-import { PiPInner } from '@/components/pipper';
+import { PiPInner, QuickMenu, QuickMenuInner } from '@/components/pipper';
 
 export const MusicPlayerContext = createContext<MusicPlayer>(null as any);
 
@@ -633,6 +633,9 @@ export default function App({ Component, pageProps }: AppProps) {
               marginBottom: '1rem',
               marginTop: '1rem',
               position: 'relative',
+              '& *': {
+                overflowY: 'hidden',
+              }
             }}>
               <AnimatePresence mode='wait'>
                 <motion.div key={router.route}
@@ -682,6 +685,11 @@ export default function App({ Component, pageProps }: AppProps) {
             zIndex: 999999,
           }}>
           </Box>
+          <div id="pipfix" style={{
+            display: 'none',
+          }}>
+            <QuickMenuInner />
+          </div>
         </div>
       </ThemeProvider>
     </MusicPlayerContext.Provider>
