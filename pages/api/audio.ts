@@ -10,8 +10,8 @@ export default function handler(
     return new Promise<void>(async (resolve, reject) => {
         const notletters = /[^a-zA-Z0-9\-éáóöőúüű]/gi;
 
-        const artist = req.query.a as string
-        const title = req.query.t as string
+        const artist = req.query.artist as string
+        const title = req.query.title as string
         const query = `${artist} ${title}`.replace(notletters, ' ').replace(/\s+/g, ' ').trim()
 
         const results = await piped.search({

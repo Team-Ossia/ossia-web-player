@@ -14,6 +14,7 @@ const PlayableSong = ({ song }: { song: Song }) => {
 
   return (<Box
     onClick={() => {
+      if (player.context && player.context.state === 'suspended') player.context.resume()
       player.play(song)
     }} component="button" key={`${song.url}`} sx={(theme) => ({
       display: 'flex',

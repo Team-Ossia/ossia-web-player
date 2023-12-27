@@ -2,8 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Song } from "./lastFm";
 import { useIsMobile } from "./isMobile";
 import { useRouter } from "next/router";
+import { useCookies } from "react-cookie";
 
 export type MusicPlayer = {
+    context: AudioContext | null;
     playing: boolean;
     audioLoading: boolean;
     currentSong: Song | null;
@@ -47,10 +49,22 @@ export const useMusicPlayer = () => {
         if (duration === 0) return 0;
         return currentTime / duration;
     }, [currentTime, duration])
+
+    const gainNode = useRef<GainNode | null>(null);
+
     const audio = useMemo(() => {
-        if (typeof window === 'undefined') return;
-        return document.getElementById("music-player-global") as HTMLAudioElement;
+        if (typeof window === 'undefined') return null;
+        return new Audio();
     }, [])
+    const context = useMemo(() => {
+        if (typeof window === 'undefined' || !audio) return null;
+        const aucon = new AudioContext();
+        const source = aucon.createMediaElementSource(audio);
+        gainNode.current = aucon.createGain();
+        source.connect(gainNode.current);
+        gainNode.current.connect(aucon.destination);
+        return aucon;
+    }, [audio, gainNode])
 
     useEffect(() => {
         if (isMobile) {
@@ -116,20 +130,21 @@ export const useMusicPlayer = () => {
     }, [audio])
 
     useEffect(() => {
-        const ac = new AbortController();
-        if (currentSong && audio) {
-            audio.src = `/api/audio?a=${currentSong.artist}&t=${currentSong.name}`;
+        if (typeof window === 'undefined') return;
+        if (currentSong && context && audio) {
+            audio.src = `/api/audio?artist=${currentSong.artist}&title=${currentSong.name}`;
+            audio.load();
             setMediaSession(currentSong);
-            return () => {
-                ac.abort();
-            };
+        } else {
+            setMediaSession();
         }
     }, [currentSong])
 
     useEffect(() => {
-        if (!audio) return;
-        audio.volume = volume;
-    }, [volume])
+        if (typeof window === 'undefined') return;
+        if (!context || !gainNode.current) return;
+        gainNode.current.gain.value = volume;
+    }, [volume, context, gainNode])
 
     const play = (song: Song) => {
         setCurrentSong(song);
@@ -142,17 +157,18 @@ export const useMusicPlayer = () => {
     }
 
     const pause = () => {
-        // toggle
+        if (!audio) return;
         if (playing) {
-            audio?.pause();
+            audio.pause();
             return;
         } else if (currentSong) {
-            audio?.play();
+            audio.play();
             return;
         }
     }
 
     return {
+        context,
         playing,
         audioLoading,
         currentSong,
