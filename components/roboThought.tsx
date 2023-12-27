@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useWeather } from "./useWeather";
+import { useContext, useEffect, useState } from "react";
+import { WeatherContext } from "@/pages/_app";
 
 const thoughts = [
     "Maybe if I tried harder...",
@@ -14,7 +14,7 @@ thoughts.sort(() => Math.random() - 0.5);
 export const useRoboThought = () => {
     const [thought, setThought] = useState(thoughts[Math.floor(Math.random() * thoughts.length)]);
     const [display, setDisplay] = useState(false);
-    const { isDay } = useWeather();
+    const { isDay } = useContext(WeatherContext);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;

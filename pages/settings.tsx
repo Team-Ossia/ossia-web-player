@@ -8,24 +8,24 @@ import {
     FormLabel,
     Radio,
     RadioGroup,
+    Checkbox,
     Switch,
     Typography,
+    Button,
 } from "@mui/material";
 import type { NextPage } from "next";
-import { motion } from 'framer-motion';
 import { useCookies } from "react-cookie";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useIsMobile } from "@/components/isMobile";
+import { WeatherContext } from "./_app";
+import { AnimatePresence, motion } from "framer-motion";
 
 const InnerPage = () => {
     //geo manual selection: {lat: number, lon: number, name: string}
-    const [cookies, setCookie] = useCookies(['weather-effects', 'geolocate-method', 'pip-enabled']);
+    const [cookies, setCookie] = useCookies(['weather-effects', 'geolocate-method']);
+    const { setEmulation, emulation } = useContext(WeatherContext);
     const isMobile = useIsMobile();
-
-    useEffect(() => {
-        console.log(cookies['pip-enabled'])
-    }, [cookies])
 
     return (<>
         <Container sx={{
@@ -86,7 +86,6 @@ const InnerPage = () => {
                             justifyContent: 'flex-start',
                             gap: '.2rem',
                         }}>
-
                             <FormControl>
                                 <FormLabel>Geolocation method</FormLabel>
                                 <RadioGroup
@@ -118,6 +117,114 @@ const InnerPage = () => {
                                     }} value={2} control={<Radio />} label="GPS" />
                                     <FormControlLabel disabled value={3} control={<Radio />} label="Manual" />
                                 </RadioGroup>
+                            </FormControl>
+                            <Box sx={{
+                                marginTop: '.5rem',
+                                display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'flex-start',
+                                alignItems: 'center',
+                                gap: '.5rem',
+                            }}>
+                                <Typography variant="h6">Weather emulation</Typography>
+                                <AnimatePresence>
+                                    {(emulation.whatIsFalling !== null || emulation.isDay !== null) &&
+                                        <motion.div
+                                            style={{
+                                                overflow: 'hidden',
+                                            }}
+                                            initial={{
+                                                width: 0,
+                                            }}
+                                            animate={{
+                                                width: 'auto',
+                                            }}
+                                            exit={{
+                                                width: 0,
+                                            }}
+                                            transition={{
+                                                duration: .2,
+                                                type: 'keyframes',
+                                                ease: 'easeInOut',
+                                            }}
+                                        >
+                                            <Button variant="outlined" sx={{
+                                                borderRadius: '1rem',
+                                                height: '1.8rem',
+                                            }} onClick={() => {
+                                                setEmulation({
+                                                    whatIsFalling: null,
+                                                    isDay: null,
+                                                })
+                                            }}>Reset</Button>
+                                        </motion.div>
+                                    }
+                                </AnimatePresence>
+                            </Box>
+                            <Typography variant="body1">
+                                Emulate weather effects for testing purposes
+                            </Typography>
+                            <Divider sx={{ marginBottom: '.3rem' }} />
+                            <FormControl>
+                                <FormLabel>Current weather</FormLabel>
+                                {/* checkboxes */}
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'flex-start',
+                                    alignItems: 'center',
+                                    columnGap: '.5rem',
+                                    flexWrap: 'wrap',
+                                }}>
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={emulation.isDay == true}
+                                            onChange={(e) => {
+                                                setEmulation({
+                                                    ...emulation,
+                                                    isDay: e.target.checked ? true : null,
+                                                })
+                                            }}
+                                        />}
+                                        label="Day"
+                                    />
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={emulation.isDay == false}
+                                            onChange={(e) => {
+                                                setEmulation({
+                                                    ...emulation,
+                                                    isDay: e.target.checked ? false : null,
+                                                })
+                                            }}
+                                        />}
+                                        label="Night"
+                                    />
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={emulation.whatIsFalling == "rain"}
+                                            onChange={(e) => {
+                                                setEmulation({
+                                                    ...emulation,
+                                                    whatIsFalling: e.target.checked ? "rain" : null,
+                                                })
+                                            }}
+                                        />}
+                                        label="Rain"
+                                    />
+                                    <FormControlLabel
+                                        control={<Checkbox
+                                            checked={emulation.whatIsFalling == "snow"}
+                                            onChange={(e) => {
+                                                setEmulation({
+                                                    ...emulation,
+                                                    whatIsFalling: e.target.checked ? "snow" : null,
+                                                })
+                                            }}
+                                        />}
+                                        label="Snow"
+                                    />
+                                </Box>
                             </FormControl>
                         </Box>
                     </motion.div>

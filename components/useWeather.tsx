@@ -3,21 +3,40 @@ import { WeatherApiResponse } from "./openMeteo"
 import { useGeo } from "./useGeo"
 import { getWeatherInfo } from "./openMeteo"
 
+export type WeatherEmulation = {
+    whatIsFalling: "rain" | "snow" | null,
+    isDay: boolean | null,
+}
+
+export type Weather = {
+    weather: WeatherApiResponse | null,
+    whatIsFalling: "rain" | "snow" | null,
+    isDay: boolean | null,
+    emulation: WeatherEmulation,
+    setEmulation: (emulation: WeatherEmulation) => void,
+}
+
 export const useWeather = () => {
     const { lat, lon } = useGeo()
     const [weather, setWeather] = useState<WeatherApiResponse | null>(null)
+    const [emulation, setEmulation] = useState<WeatherEmulation>({
+        whatIsFalling: null,
+        isDay: null,
+    })
 
     const whatIsFalling = useMemo(() => {
+        if (emulation.whatIsFalling) return emulation.whatIsFalling
         if (!weather || !weather.current) return null
         if (weather.current.rain > 0) return "rain"
         if (weather.current.snowfall > 0) return "snow"
         return null
-    }, [weather])
+    }, [weather, emulation])
 
     const isDay = useMemo(() => {
+        if (emulation.isDay !== null) return emulation.isDay
         if (!weather || !weather.current) return null
         return weather.current.is_day == 1
-    }, [weather])
+    }, [weather, emulation])
 
     useEffect(() => {
         // get weather data every minute
@@ -49,5 +68,7 @@ export const useWeather = () => {
         weather,
         whatIsFalling,
         isDay,
+        emulation,
+        setEmulation,
     }
 }
