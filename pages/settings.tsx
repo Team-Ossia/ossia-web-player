@@ -34,7 +34,7 @@ const InnerPage = () => {
                 color: 'rgba(255,255,255,.7) !important',
             }
         }}>
-            <Typography variant="h1" align="center">Settings</Typography>
+            <Typography variant="h2" align="center">Settings</Typography>
             <Divider style={{ margin: '.5rem 0' }} />
             <Box sx={{
                 display: 'flex',
@@ -45,6 +45,7 @@ const InnerPage = () => {
             }}>
                 <Card variant="outlined" sx={{
                     width: '100%',
+                    border: 'none',
                     padding: '1rem',
                     borderRadius: '1rem',
                 }}>
@@ -231,12 +232,15 @@ const InnerPage = () => {
                 </Card>
                 <Card variant="outlined" sx={{
                     width: '100%',
+                    border: 'none',
                     padding: '1rem',
                     borderRadius: '1rem',
                 }}>
                     <Typography variant="h4">Credits</Typography>
                     <Divider style={{ margin: '.5rem 0' }} />
-                    <Typography variant="body1">&quot;Horizon&quot; font by <a target="_blank" href="https://typefaceseger.com/">Köteles Tamás</a></Typography>
+                    <Typography variant="body1">Design: <a target="_blank" href="https://www.behance.net/sonkolybence">Bence Sonkoly</a>, <a target="_blank" href="https://www.behance.net/milantakacs">Milán Takács</a></Typography>
+                    <Typography variant="body1">Graphics: <a target="_blank" href="https://www.behance.net/milantakacs">Milán Takács</a></Typography>
+                    <Typography variant="body1">&quot;Horizon&quot; font by <a target="_blank" href="https://typefaceseger.com/">Tamás Köteles</a></Typography>
                     <Typography variant="body1">Weather data by <a target="_blank" href="https://open-meteo.com">open-meteo.com</a></Typography>
                     <Typography variant="body1">Icons and UI by <a target="_blank" href="https://mui.com">mui.com</a></Typography>
                     <Typography variant="body1">Night background by <a target="_blank" href="https://codepen.io/bennettfeely/">bennettfeely</a></Typography>
