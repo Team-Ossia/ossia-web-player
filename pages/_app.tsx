@@ -226,7 +226,7 @@ export const NowPlayingWidgetBottom = () => {
                 width: 'var(--now-playing-widget-height)',
                 maxHeight: '100%',
                 borderRadius: '1rem',
-              }} width={250} height={250} src={`/api/artwork?artist=${encodeURIComponent(musicPlayer.currentSong?.artist || "laurie.")}&title=${encodeURIComponent(musicPlayer.currentSong?.name || "pára")}`} alt="" />
+              }} width={250} height={250} src={`/api/spotify/artwork?artist=${encodeURIComponent(musicPlayer.currentSong?.artist || "laurie.")}&title=${encodeURIComponent(musicPlayer.currentSong?.name || "pára")}`} alt="" />
               <div>
                 <h5 style={{
                   margin: 0,
@@ -273,7 +273,7 @@ export const SongBG = () => {
       zIndex: -3,
       opacity: 0.2,
       filter: 'blur(10px)',
-      backgroundImage: `url("/api/artwork?artist=${encodeURIComponent(player.currentSong?.artist)}&title=${encodeURIComponent(player.currentSong?.name)}")`,
+      backgroundImage: `url("/api/spotify/artwork?artist=${encodeURIComponent(player.currentSong?.artist)}&title=${encodeURIComponent(player.currentSong?.name)}")`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     }} /></motion.div>}

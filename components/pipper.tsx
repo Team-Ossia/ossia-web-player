@@ -93,7 +93,7 @@ export const QuickMenuInner = ({ pip }: {
                         type: 'keyframes',
                     }}
                 >
-                    <img src={`/api/artwork?artist=${player.currentSong?.artist}&title=${player.currentSong?.name}`} alt="" className="bg" style={{
+                    <img src={`/api/spotify/artwork?artist=${player.currentSong?.artist}&title=${player.currentSong?.name}`} alt="" className="bg" style={{
                         position: 'fixed',
                         top: 0,
                         left: 0,
@@ -137,7 +137,7 @@ export const QuickMenuInner = ({ pip }: {
                             height: 128,
                             overflow: 'hidden',
                             minWidth: 128,
-                        }} alt={player.currentSong?.name} src={`/api/artwork?artist=${player.currentSong?.artist}&title=${player.currentSong?.name}`} width={128} height={128} />
+                        }} alt={player.currentSong?.name} src={`/api/spotify/artwork?artist=${player.currentSong?.artist}&title=${player.currentSong?.name}`} width={128} height={128} />
                 }
             </AnimatePresence>
             <Box sx={{

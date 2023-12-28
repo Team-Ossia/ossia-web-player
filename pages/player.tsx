@@ -96,7 +96,7 @@ const Player: NextPage = () => {
                                     transition: 'transform .2s ease-in-out',
                                     transform: player.currentSong ? 'scaleY(1)' : 'scaleY(0)',
                                     height: 'auto',
-                                }} alt="" src={player.currentSong ? `/api/artwork?artist=${player.currentSong?.artist}&title=${player.currentSong?.name}` : ""} width={256} height={256} />
+                                }} alt="" src={player.currentSong ? `/api/spotify/artwork?artist=${player.currentSong?.artist}&title=${player.currentSong?.name}` : ""} width={256} height={256} />
                                 {!isMobile &&
                                     <Slider slots={{
                                         thumb: VolumeThumbComponent

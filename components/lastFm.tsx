@@ -17,7 +17,7 @@ export const querySongs = async (query: string, ac?: AbortController) => {
     let data = await response.json();
     const filteredTracks = await Promise.all(data.results.trackmatches.track.map(async (song: Song) => {
         // use fetch api to check if the song has artwork, only fetch status code
-        const response = await fetch(`/api/artwork?artist=${song.artist}&title=${song.name}`, {
+        const response = await fetch(`/api/spotify/artwork?artist=${song.artist}&title=${song.name}`, {
             method: 'HEAD',
             signal: ac?.signal,
         });

@@ -53,7 +53,7 @@ const PlayableSong = ({ song }: { song: Song }) => {
       width: 64,
       height: 64,
       minWidth: 64,
-    }} alt={song.name} src={`/api/artwork?artist=${song.artist}&title=${song.name}`} width={64} height={64} />
+    }} alt={song.name} src={`/api/spotify/artwork?artist=${song.artist}&title=${song.name}`} width={64} height={64} />
     <div style={{
       overflow: 'hidden',
       display: 'flex',

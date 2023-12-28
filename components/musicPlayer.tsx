@@ -33,7 +33,7 @@ export const setMediaSession = (song?: Song) => {
             title: song.name,
             artist: song.artist,
             artwork: [
-                { src: `/api/artwork?artist=${song.artist}&title=${song.name}`, sizes: '600x600', type: 'image/jpg' },
+                { src: `/api/spotify/artwork?artist=${song.artist}&title=${song.name}`, sizes: '600x600', type: 'image/jpg' },
             ]
         });
     }
@@ -59,7 +59,7 @@ export const useMusicPlayer = () => {
         if (!currentSong) {
             return;
         };
-        fetch(`/api/artwork?artist=${encodeURIComponent(currentSong.artist)}&title=${encodeURIComponent(currentSong.name)}`, {
+        fetch(`/api/spotify/artwork?artist=${encodeURIComponent(currentSong.artist)}&title=${encodeURIComponent(currentSong.name)}`, {
             method: "HEAD",
         }).then(resp => {
             setColors(resp.headers.get("X-Colors")?.split(",") || []);
