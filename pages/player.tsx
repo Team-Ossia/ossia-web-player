@@ -137,7 +137,9 @@ const Player: NextPage = () => {
                                 }
                             </Box>
                         </Box>
-                        <Box>
+                        <Box sx={{
+                            textShadow: "2px 2px 5px rgba(0,0,0,.6)",
+                        }}>
                             <Typography sx={{
                                 fontSize: '1.5rem',
                                 fontWeight: 'bold',
