@@ -4,16 +4,19 @@ import { useIsMobile } from "./isMobile";
 import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
 import { MusicPlayerContext } from "@/pages/_app";
+import spotify, { TrackFeatures } from "./spotify";
 
 export type MusicPlayer = {
     playing: boolean;
     audioLoading: boolean;
     currentSong: Song | null;
+    relatedSongs: Song[] | null;
     colors: string[];
     volume: number;
     currentTime: number;
     duration: number;
     percentage: number;
+    trackFeatures: TrackFeatures | null;
     setVolume: (volume: number) => void;
     play: (song: Song) => void;
     pause: () => void;
@@ -48,11 +51,28 @@ export const useMusicPlayer = () => {
     const [audioLoading, setAudioLoading] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [colors, setColors] = useState<string[]>([]);
+
     const percentage = useMemo(() => {
         if (duration === 0) return 0;
         return currentTime / duration;
     }, [currentTime, duration])
-    const [colors, setColors] = useState<string[]>([]);
+
+    const relatedSongs = useMemo(() => {
+        if (!currentSong) return null;
+        return spotify.getRecommendations([currentSong.spotify_id]).then((data) => {
+            return data.tracks.map((track: any) => ({
+                name: track.name,
+                artist: track.artists[0].name,
+                spotify_id: track.id,
+            }))
+        }).catch(() => null);
+    }, [currentSong])
+
+    const trackFeatures = useMemo(() => {
+        if (!currentSong) return null;
+        return spotify.getTrackFeatures(currentSong.spotify_id).catch(() => null);
+    }, [currentSong])
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -190,11 +210,13 @@ export const useMusicPlayer = () => {
         playing,
         audioLoading,
         currentSong,
+        relatedSongs,
         colors,
         volume,
         currentTime,
         duration,
         percentage,
+        trackFeatures,
         setVolume,
         play,
         pause,

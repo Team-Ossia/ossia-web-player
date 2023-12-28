@@ -259,7 +259,7 @@ export const SongBG = () => {
   const player = useContext(MusicPlayerContext);
 
   return (<AnimatePresence>
-    {player.currentSong && <motion.div className='song-bg' key={player.currentSong.url}
+    {player.currentSong && <motion.div className='song-bg' key={player.currentSong.spotify_id}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -572,15 +572,6 @@ export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const hotkeyHandler = (e: KeyboardEvent) => {
-      // TEST HOTKEY
-      if (e.ctrlKey && e.key === 'x') {
-        musicPlayer.play({
-          "name": "angyal",
-          "artist": "luvzee",
-          "url": "https://www.last.fm/music/luvzee/_/angyal",
-        })
-      }
-
       // PLAY/PAUSE and input not focused
       if (e.key === ' ' && document.activeElement?.tagName !== 'INPUT') {
         e.preventDefault()

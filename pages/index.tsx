@@ -12,7 +12,7 @@ const PlayableSong = ({ song }: { song: Song }) => {
     onClick={() => {
       if (player.context && player.context.state === 'suspended') player.context.resume()
       player.play(song)
-    }} component="button" key={`${song.url}`} sx={(theme) => ({
+    }} component="button" key={`${song.spotify_id}`} sx={(theme) => ({
       display: 'flex',
       backgroundColor: "transparent",
       textAlign: 'left',
@@ -201,7 +201,7 @@ const Home: NextPage = () => {
       width: '100%',
     }}>
       {searchResults && searchResults.map((song, i) => {
-        return (<PlayableSong key={`${song.url}`} song={song} />)
+        return (<PlayableSong key={`${song.spotify_id}`} song={song} />)
       })}
     </Box>
   </div >;
