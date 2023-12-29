@@ -337,6 +337,23 @@ const Player: NextPage = () => {
                                     gap: '.5rem',
                                     borderRadius: '1.25rem',
                                     backgroundColor: 'rgba(255,255,255,.05)',
+                                    overflowX: 'auto',
+                                    // slim scrollbar
+                                    '&::-webkit-scrollbar': {
+                                        height: '.5rem',
+                                    },
+                                    '&::-webkit-scrollbar-track': {
+                                        borderRadius: '.25rem',
+                                        backgroundColor: 'rgba(255,255,255,.05)',
+                                    },
+                                    '&::-webkit-scrollbar-thumb': {
+                                        borderRadius: '.25rem',
+                                        backgroundColor: 'rgba(255,255,255,.2)',
+                                    },
+                                    '&::-webkit-scrollbar-thumb:hover': {
+                                        backgroundColor: 'rgba(255,255,255,.4)',
+                                    },
+
                                 }}>
                                     <SelectableChip onClick={() => {
                                         player.setRelationProfile("track")
