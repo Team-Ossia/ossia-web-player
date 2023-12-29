@@ -167,11 +167,50 @@ export const useMusicPlayer = () => {
         return aucon;
     }, [audio, gainNode, analyser])
 
+    const play = (song: Song) => {
+        setCurrentSong(song);
+        setPlaying(true);
+    }
+
+    const seek = useCallback((time: number) => {
+        if (!audio) return;
+        audio.currentTime = time;
+    }, [audio])
+
+    const pause = useCallback(() => {
+        if (!audio) return;
+        if (playing) {
+            audio.pause();
+            return;
+        } else if (currentSong) {
+            audio.play();
+            return;
+        }
+    }, [playing, audio, currentSong])
+
+    const next = useCallback(() => {
+        const song = getNextSong();
+        if (!song) return;
+        play(song);
+    }, [getNextSong])
+
+    const drop = () => {
+        setQueue([]);
+        setPlaying(false);
+        setCurrentSong(null);
+    }
+
     useEffect(() => {
         if (isMobile) {
             setVolume(1)
         }
     }, [isMobile])
+
+    useEffect(() => {
+        if (percentage === 1) {
+            next();
+        }
+    }, [percentage])
 
     useEffect(() => {
         if (typeof window === 'undefined' || !audio) return;
@@ -180,9 +219,6 @@ export const useMusicPlayer = () => {
         }
         const onAudioPause = () => {
             setPlaying(false);
-        }
-        const onAudioEnd = () => {
-            next();
         }
         const onAudioError = (...e: any[]) => {
             console.error("Audio error", ...e)
@@ -202,7 +238,6 @@ export const useMusicPlayer = () => {
         }
         audio.addEventListener("play", onAudioStart);
         audio.addEventListener("pause", onAudioPause);
-        audio.addEventListener("ended", onAudioEnd);
         audio.addEventListener("error", onAudioError);
         audio.addEventListener("loadstart", onLoadStart);
         audio.addEventListener("loadeddata", onAudioLoaded);
@@ -211,7 +246,6 @@ export const useMusicPlayer = () => {
         return () => {
             audio.removeEventListener("play", onAudioStart);
             audio.removeEventListener("pause", onAudioPause);
-            audio.removeEventListener("ended", onAudioEnd);
             audio.removeEventListener("error", onAudioError);
             audio.removeEventListener("loadstart", onLoadStart);
             audio.removeEventListener("loadeddata", onAudioLoaded);
@@ -235,39 +269,6 @@ export const useMusicPlayer = () => {
         if (!context || !gainNode.current) return;
         gainNode.current.gain.value = volume;
     }, [volume, context, gainNode])
-
-    const play = (song: Song) => {
-        setCurrentSong(song);
-        setPlaying(true);
-    }
-
-    const seek = (time: number) => {
-        if (!audio) return;
-        audio.currentTime = time;
-    }
-
-    const pause = () => {
-        if (!audio) return;
-        if (playing) {
-            audio.pause();
-            return;
-        } else if (currentSong) {
-            audio.play();
-            return;
-        }
-    }
-
-    const next = () => {
-        const song = getNextSong();
-        if (!song) return;
-        play(song);
-    }
-
-    const drop = () => {
-        setQueue([]);
-        setPlaying(false);
-        setCurrentSong(null);
-    }
 
     return {
         playing,
