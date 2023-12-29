@@ -78,7 +78,7 @@ export const QuickMenuInner = ({ pip }: {
             </motion.div>
             <AnimatePresence>
                 {player.currentSong && <motion.div
-                    key={player.currentSong?.url}
+                    key={player.currentSong?.spotify_id}
                     initial={{
                         opacity: 0,
                     }}
