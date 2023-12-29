@@ -223,6 +223,7 @@ export const useMusicPlayer = () => {
         const onAudioError = (...e: any[]) => {
             console.error("Audio error", ...e)
             setPlaying(false);
+            setCurrentSong(null);
         }
         const onLoadStart = () => {
             setAudioLoading(true);
@@ -243,6 +244,10 @@ export const useMusicPlayer = () => {
         audio.addEventListener("loadeddata", onAudioLoaded);
         audio.addEventListener("timeupdate", onProgress);
         audio.addEventListener("waiting", onLoadStart)
+        audio.addEventListener("seeking", onLoadStart)
+        audio.addEventListener("seeked", onAudioLoaded)
+        audio.addEventListener("stalled", onLoadStart)
+        audio.addEventListener("abort", onAudioError)
         return () => {
             audio.removeEventListener("play", onAudioStart);
             audio.removeEventListener("pause", onAudioPause);
@@ -250,6 +255,11 @@ export const useMusicPlayer = () => {
             audio.removeEventListener("loadstart", onLoadStart);
             audio.removeEventListener("loadeddata", onAudioLoaded);
             audio.removeEventListener("timeupdate", onProgress);
+            audio.removeEventListener("waiting", onLoadStart)
+            audio.removeEventListener("seeking", onLoadStart)
+            audio.removeEventListener("seeked", onAudioLoaded)
+            audio.removeEventListener("stalled", onLoadStart)
+            audio.removeEventListener("abort", onAudioError)
         }
     }, [audio])
 
