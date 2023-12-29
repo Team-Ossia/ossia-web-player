@@ -319,15 +319,22 @@ const Player: NextPage = () => {
                                 }}
                                 initial={{
                                     height: 0,
+                                    opacity: 0,
                                 }}
                                 animate={{
                                     height: 'auto',
+                                    opacity: 1,
                                 }}
                                 exit={{
                                     height: 0,
+                                    opacity: 0,
+                                }}
+                                transition={{
+                                    duration: .2,
+                                    type: 'keyframes',
                                 }}
                             >
-                                <Box sx={{
+                                <Box id="related-chips" sx={{
                                     display: 'flex',
                                     flexDirection: 'row',
                                     justifyContent: 'flex-start',
@@ -338,22 +345,20 @@ const Player: NextPage = () => {
                                     borderRadius: '1.25rem',
                                     backgroundColor: 'rgba(255,255,255,.05)',
                                     overflowX: 'auto',
-                                    // slim scrollbar
+                                    overflowY: 'hidden',
                                     '&::-webkit-scrollbar': {
-                                        height: '.5rem',
+                                        height: '.3rem',
                                     },
                                     '&::-webkit-scrollbar-track': {
-                                        borderRadius: '.25rem',
-                                        backgroundColor: 'rgba(255,255,255,.05)',
+                                        backgroundColor: 'transparent',
                                     },
                                     '&::-webkit-scrollbar-thumb': {
-                                        borderRadius: '.25rem',
                                         backgroundColor: 'rgba(255,255,255,.2)',
+                                        borderRadius: '1rem',
                                     },
                                     '&::-webkit-scrollbar-thumb:hover': {
                                         backgroundColor: 'rgba(255,255,255,.4)',
                                     },
-
                                 }}>
                                     <SelectableChip onClick={() => {
                                         player.setRelationProfile("track")
