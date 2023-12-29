@@ -122,17 +122,12 @@ const Player: NextPage = () => {
                             <Box sx={{
                                 position: 'relative',
                                 maxWidth: '100%',
-                                '& .innerText': {
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    left: 0,
-                                },
                             }}>
                                 <img draggable={false} style={{
-                                    borderRadius: '0 0 .4rem .4rem',
                                     boxShadow: `${defaultShadow[0]} ${defaultShadow[1]} ${defaultShadow[2]} rgba(0,0,0,.4)`,
                                     overflow: 'hidden',
                                     maxWidth: '50vmin',
+                                    borderRadius: '.4rem',
                                     transition: 'transform .2s ease-in-out',
                                     transform: player.currentSong ? 'scaleY(1)' : 'scaleY(0)',
                                     height: 'auto',
