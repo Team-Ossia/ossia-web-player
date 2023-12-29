@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Song } from "./lastFm";
 import { useIsMobile } from "./isMobile";
 import { useRouter } from "next/router";
@@ -8,9 +8,10 @@ import spotify, { TrackFeatures } from "./spotify";
 
 export type MusicPlayer = {
     playing: boolean;
+    repeat: boolean;
     audioLoading: boolean;
     currentSong: Song | null;
-    relatedSongs: Song[] | null;
+    relatedTracks: Song[] | null;
     colors: string[];
     volume: number;
     currentTime: number;
@@ -18,11 +19,16 @@ export type MusicPlayer = {
     percentage: number;
     trackFeatures: TrackFeatures | null;
     setVolume: (volume: number) => void;
+    setRepeat: (repeat: boolean) => void;
     play: (song: Song) => void;
     pause: () => void;
     seek: (time: number) => void;
+    next: () => void;
+    drop: () => void;
     context: AudioContext | null;
     analyser: AnalyserNode | null;
+    relationProfile: RelationProfile;
+    setRelationProfile: (profile: RelationProfile) => void;
 }
 
 export const setMediaSession = (song?: Song) => {
@@ -42,36 +48,92 @@ export const setMediaSession = (song?: Song) => {
     }
 }
 
+export type RelationProfile = "track" | "artist"
+
 export const useMusicPlayer = () => {
     const [playing, setPlaying] = useState(false);
     const [currentSong, setCurrentSong] = useState<Song | null>(null);
     const [volume, setVolume] = useState(0.5);
     const isMobile = useIsMobile()
-    const router = useRouter()
     const [audioLoading, setAudioLoading] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [colors, setColors] = useState<string[]>([]);
+    const [allRelatedTracks, setAllRelatedTracks] = useState<{
+        [key in RelationProfile]: Song[];
+    } | null>(null);
+    const [queue, setQueue] = useState<Song[]>([]);
+    const [repeat, setRepeat] = useState(false);
+
+    const [trackFeatures, setTrackFeatures] = useState<TrackFeatures | null>(null);
+    const [relationProfile, setRelationProfile] = useState<RelationProfile>("track");
+
+    const relatedTracks = useMemo(() => {
+        if (!allRelatedTracks) return null;
+        return allRelatedTracks[relationProfile];
+    }, [allRelatedTracks, relationProfile])
+
+    const getNextSong = useCallback(() => {
+        if (!currentSong) return null;
+        if (repeat) {
+            return currentSong;
+        }
+        if (queue.length) {
+            const song = queue[0];
+            setQueue(queue.slice(1));
+            return song;
+        } else if (allRelatedTracks?.track?.length) {
+            return allRelatedTracks.track[Math.floor(Math.random() * allRelatedTracks.track.length)];
+        }
+        return null;
+    }, [queue, allRelatedTracks, repeat])
 
     const percentage = useMemo(() => {
         if (duration === 0) return 0;
         return currentTime / duration;
     }, [currentTime, duration])
 
-    const relatedSongs = useMemo(() => {
-        if (!currentSong) return null;
-        return spotify.getRecommendations([currentSong.spotify_id]).then((data) => {
-            return data.tracks.map((track: any) => ({
-                name: track.name,
-                artist: track.artists[0].name,
-                spotify_id: track.id,
-            }))
+    useEffect(() => {
+        const ac = new AbortController();
+        setTrackFeatures(null);
+        if (!currentSong) {
+            return;
+        };
+        spotify.getTrackFeatures(currentSong.spotify_id, ac).then((data) => {
+            setTrackFeatures(data);
         }).catch(() => null);
+        return () => {
+            ac.abort();
+        }
     }, [currentSong])
 
-    const trackFeatures = useMemo(() => {
-        if (!currentSong) return null;
-        return spotify.getTrackFeatures(currentSong.spotify_id).catch(() => null);
+    useEffect(() => {
+        setAllRelatedTracks(null);
+        if (!currentSong) {
+            return;
+        };
+        const ac = new AbortController();
+        const artistTracks = spotify.getArtistTopTracks(currentSong.spotify_artist_id, ac);
+        const trackTracks = spotify.getRecommendations({
+            seed_tracks: [currentSong.spotify_id],
+            seed_artists: [currentSong.spotify_artist_id],
+        }, ac);
+        Promise.all([artistTracks, trackTracks]).then(([artistTracks, trackTracks]) => {
+            setAllRelatedTracks({
+                artist: artistTracks.tracks.map((track) => ({
+                    name: track.name,
+                    artist: track.artists[0].name,
+                    spotify_id: track.id,
+                    spotify_artist_id: track.artists[0].id,
+                })),
+                track: trackTracks.tracks.map((track) => ({
+                    name: track.name,
+                    artist: track.artists[0].name,
+                    spotify_id: track.id,
+                    spotify_artist_id: track.artists[0].id,
+                })),
+            })
+        }).catch(() => null);
     }, [currentSong])
 
     useEffect(() => {
@@ -120,18 +182,7 @@ export const useMusicPlayer = () => {
             setPlaying(false);
         }
         const onAudioEnd = () => {
-            if (router.pathname.startsWith("/player")) {
-                router.push("/")
-                setTimeout(() => {
-                    setPlaying(false);
-                    setCurrentSong(null);
-                    audio.src = "";
-                }, 450)
-                return;
-            };
-            setPlaying(false);
-            setCurrentSong(null);
-            audio.src = "";
+            next();
         }
         const onAudioError = (...e: any[]) => {
             console.error("Audio error", ...e)
@@ -206,11 +257,26 @@ export const useMusicPlayer = () => {
         }
     }
 
+    const next = () => {
+        const song = getNextSong();
+        if (!song) return;
+        play(song);
+    }
+
+    const drop = () => {
+        setQueue([]);
+        setPlaying(false);
+        setCurrentSong(null);
+    }
+
     return {
         playing,
+        repeat,
+        setRepeat,
+        drop,
         audioLoading,
         currentSong,
-        relatedSongs,
+        relatedTracks,
         colors,
         volume,
         currentTime,
@@ -221,7 +287,10 @@ export const useMusicPlayer = () => {
         play,
         pause,
         seek,
+        next,
         context,
         analyser: analyser.current,
+        relationProfile,
+        setRelationProfile
     }
 }

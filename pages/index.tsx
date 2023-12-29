@@ -1,11 +1,51 @@
 import lastFm, { Song } from '@/components/lastFm';
 import { Box, CircularProgress, Divider, TextField, Typography, useTheme } from '@mui/material';
 import type { NextPage } from 'next';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { MusicPlayerContext } from './_app';
 import { AnimatePresence, motion } from 'framer-motion';
 
-const PlayableSong = ({ song }: { song: Song }) => {
+export const RevolvingText = ({ children }: { children: React.ReactNode }) => {
+  const container = useRef<HTMLDivElement>(null)
+  const [doRevolve, setDoRevolve] = useState(false)
+
+  useEffect(() => {
+    if (container.current!.scrollWidth > container.current!.offsetWidth) setDoRevolve(true)
+  }, [container.current])
+
+  return (<div ref={container} style={{
+    display: 'flex',
+    flexDirection: 'row',
+    gap: '.5rem',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+  }}>
+    <div style={{
+      width: 'max-content',
+    }}>
+      {doRevolve ? <motion.div
+        animate={{
+          x: [0,
+            -container.current!.scrollWidth + container.current!.clientWidth,
+            0],
+        }}
+        transition={{
+          repeat: Infinity,
+          duration: 10,
+          ease: 'linear',
+        }}
+      >
+        {children}
+      </motion.div> : children}
+    </div>
+  </div>)
+}
+
+export const PlayableSong = ({ song }: { song: Song }) => {
   const player = useContext(MusicPlayerContext)
 
   return (<Box
@@ -22,12 +62,6 @@ const PlayableSong = ({ song }: { song: Song }) => {
       border: '1px solid transparent',
       borderRadius: '0.4rem',
       transition: 'border-color .05s ease-in-out, padding .05s ease-in-out',
-      'div:has(h5)': {
-        transition: 'margin-left .2s ease-in-out',
-      },
-      ':hover div:has(h5)': {
-        marginLeft: '.4rem',
-      },
       ':before': {
         content: '""',
         position: 'absolute',
@@ -63,17 +97,16 @@ const PlayableSong = ({ song }: { song: Song }) => {
       gap: '.2rem',
       flexShrink: 1,
     }}>
+      <RevolvingText>
+        <Typography style={{
+          color: "white",
+          width: "max-content",
+        }} variant="h5">{song.name}</Typography>
+      </RevolvingText>
       <Typography style={{
-        // line clamp 2
-        display: '-webkit-box',
-        WebkitBoxOrient: 'vertical',
         color: "white",
-        WebkitLineClamp: 2,
+        whiteSpace: 'nowrap',
         overflow: 'hidden',
-        textOverflow: 'ellipsis',
-      }} variant="h5">{song.name}</Typography>
-      <Typography style={{
-        color: "white",
       }} variant="subtitle1">{song.artist}</Typography>
     </div>
   </Box>)

@@ -41,7 +41,7 @@ import { Weather, useWeather } from '@/components/useWeather';
 import { StarryNight } from '@/components/starry_night';
 import { useRoboThought } from '@/components/roboThought';
 import { PiPProvider } from '@/components/pip';
-import { PiPInner, QuickMenu, QuickMenuInner } from '@/components/pipper';
+import { PiPInner, QuickMenuInner } from '@/components/pipper';
 
 export const WeatherContext = createContext<Weather>(null as any);
 export const MusicPlayerContext = createContext<MusicPlayer>(null as any);

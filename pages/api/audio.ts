@@ -51,7 +51,7 @@ export default function handler(
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         res.setHeader('Access-Control-Max-Age', '86400');
         res.setHeader('X-VideoID', videoID);
-        res.setHeader('X-Query', query);
+        res.setHeader('X-Query', encodeURIComponent(query));
         if (stream.contentLength) {
             res.setHeader('Content-Length', stream.contentLength);
             res.setHeader('Accept-Ranges', 'bytes');
@@ -62,7 +62,10 @@ export default function handler(
             https.get(stream.url, (response) => {
                 response.pipe(res);
                 response.on('end', resolve);
-                response.on('error', reject);
+                response.on('error', ()=>{
+                    res.status(500).json({ error: 'Stream error' })
+                    reject();
+                });
             });
         });
     })

@@ -27,14 +27,23 @@ export const getTrackSpotifyId = async (artist: string, title: string, ac?: Abor
     if (!song) throw new Error('Song not found');
     if (song.artists[0].name.toLowerCase() !== artist.toLowerCase()) throw new Error('Song not found');
     if (song.name.toLowerCase() !== title.toLowerCase()) throw new Error('Song not found');
-    return response.data.tracks.items[0].id;
+    // {track:string, artist:string}
+    return {
+        track: song.id,
+        artist: song.artists[0].id,
+    };
 }
 
-export const getRecommendations = async (seed_tracks: string[], ac?: AbortController) => {
+export const getRecommendations = async (props: {
+    seed_tracks?: string[],
+    seed_artists?: string[],
+}, ac?: AbortController) => {
+    if (!props.seed_tracks && !props.seed_artists) throw new Error('No seeds provided');
     const response = await axios.get(`${apiroot}/recommendations`, {
         params: {
-            seed_tracks: seed_tracks.join(','),
-            limit: 10,
+            seed_tracks: props.seed_tracks?.join(','),
+            seed_artists: props.seed_artists?.join(','),
+            limit: 25,
         },
         headers: {
             'Authorization': `Bearer ${await getAccessToken()}`
@@ -46,6 +55,7 @@ export const getRecommendations = async (seed_tracks: string[], ac?: AbortContro
             name: string,
             artists: {
                 name: string,
+                id: string,
             }[],
             id: string,
             [key: string]: any,
@@ -78,11 +88,36 @@ export type TrackFeatures = {
 export const getTrackFeatures = async (id: string, ac?: AbortController) => {
     const response = await axios.get(`${apiroot}/audio-features/${id}`, {
         headers: {
-            'Authorization': `Bearer ${await getAccessToken()}`
+            'Authorization': `Bearer ${await getAccessToken()}`,
         },
         signal: ac?.signal,
     });
     return response.data as TrackFeatures;
+}
+
+export const getArtistTopTracks = async (id: string, ac?: AbortController) => {
+    const response = await axios.get(`${apiroot}/artists/${id}/top-tracks`, {
+        params: {
+            country: 'US',
+            limit: 25,
+        },
+        headers: {
+            'Authorization': `Bearer ${await getAccessToken()}`
+        },
+        signal: ac?.signal,
+    });
+    return response.data as {
+        tracks: {
+            name: string,
+            artists: {
+                name: string,
+                id: string,
+            }[],
+            id: string,
+            [key: string]: any,
+        }[]
+        [key: string]: any,
+    };
 }
 
 const spotify = {
@@ -90,6 +125,7 @@ const spotify = {
     getTrackSpotifyId,
     getRecommendations,
     getTrackFeatures,
+    getArtistTopTracks,
 };
 
 export default spotify;

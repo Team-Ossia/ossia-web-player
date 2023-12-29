@@ -36,6 +36,16 @@
   }
 }
 
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
 @font-face {
   font-family: 'Horizon';
   src: url('/fonts/Horizon/Horizon-bold-italic.ttf');

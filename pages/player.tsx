@@ -1,20 +1,57 @@
-import { Pause, PlayArrow, SkipNext, SkipPrevious } from "@mui/icons-material";
+import { ArrowDropDown, ArrowDropUp, ArrowRightAlt, Favorite, Mic, Pause, PlayArrow, Repeat, RepeatOne, RepeatOneOn, Shuffle, SkipNext, SkipPrevious } from "@mui/icons-material";
 import {
     Box,
     Button,
+    Chip,
     CircularProgress,
     Container,
+    Divider,
     IconButton,
     Slider,
     SliderThumb,
     Typography,
 } from "@mui/material";
 import type { NextPage } from "next";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MusicPlayerContext, defaultShadow } from "./_app";
 import { useIsMobile } from "@/components/isMobile";
 import { useRouter } from "next/router";
 import { dvh } from "@/components/units";
+import { motion, AnimatePresence } from "framer-motion";
+import { PlayableSong } from ".";
+
+export const SelectableChip = ({
+    label,
+    selected,
+    onClick,
+}: {
+    label: React.ReactNode;
+    selected: boolean;
+    onClick: () => void;
+}) => {
+    return (
+        <Chip
+            onClick={onClick}
+            sx={{
+                backgroundColor: selected ? "rgba(255,255,255,.2)" : "transparent",
+                "&:hover": {
+                    backgroundColor: "rgba(255,255,255,.2)",
+                    cursor: "pointer",
+                },
+                "&:active": {
+                    backgroundColor: "rgba(255,255,255,.4)",
+                },
+            }}
+            label={<span style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '.2rem',
+                fontSize: '.8rem',
+            }}>{label}</span>}
+        />
+    );
+}
 
 export const VolumeThumbComponent = (props: any) => {
     const { children, ...other } = props;
@@ -35,6 +72,7 @@ const Player: NextPage = () => {
     const router = useRouter()
     const [seekbar, setSeekbar] = useState(0)
     const [seeking, setSeeking] = useState(false)
+    const [showDetails, setShowDetails] = useState(true)
 
     useEffect(() => {
         if (!player.currentSong) router.push("/")
@@ -52,15 +90,17 @@ const Player: NextPage = () => {
 
     return (<>
         <Container sx={{
-            maxWidth: '45rem'
+            maxWidth: '45rem',
         }}>
             {player.currentSong !== null &&
                 <Box sx={{
                     minHeight: `calc(${dvh(100)} - var(--bottom-nav-height) - var(--bottom-nav-space))`,
+                    //start from center
+                    paddingTop: `calc((${dvh(100)}) / 2 - 256px)`,
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-start',
                     alignItems: 'center',
                 }}>
                     <Box sx={{
@@ -157,8 +197,10 @@ const Player: NextPage = () => {
                             alignItems: 'center',
                             gap: '1rem',
                         }}>
-                            <IconButton>
-                                <SkipPrevious fontSize="large" />
+                            <IconButton onClick={() => {
+                                player.setRepeat(!player.repeat)
+                            }}>
+                                {player.repeat ? <RepeatOne fontSize="large" /> : <Shuffle fontSize="large" />}
                             </IconButton>
                             {player.audioLoading ?
                                 <Box sx={(theme) => ({
@@ -192,7 +234,7 @@ const Player: NextPage = () => {
                                     {player.playing ? <Pause fontSize="large" /> : <PlayArrow fontSize="large" />}
                                 </Button>
                             }
-                            <IconButton>
+                            <IconButton onClick={() => player.next()}>
                                 <SkipNext fontSize="large" />
                             </IconButton>
                         </Box>
@@ -227,9 +269,103 @@ const Player: NextPage = () => {
                             },
                         }} />
                     </div>
+                    <Divider sx={{
+                        width: '100%',
+                        maxWidth: 470,
+                        marginBottom: '1rem',
+                    }}>
+                        <Chip
+                            onClick={() => {
+                                setShowDetails(!showDetails)
+                            }}
+                            sx={{
+                                cursor: 'pointer',
+                                display: 'flex',
+                                justifyContent: 'flex-start',
+                                alignItems: "flex-start",
+                                '& span': {
+                                    fontSize: '2rem',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    height: '100%',
+                                    padding: '0 1rem',
+                                    overflow: 'hidden',
+                                }
+                            }} label={<motion.div
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    gap: '1rem',
+                                }}
+                                animate={{
+                                    transform: !showDetails ? 'translateY(-30%)' : 'translateY(30%)',
+                                }}
+                                transition={{
+                                    duration: .2,
+                                    type: 'keyframes',
+                                }}
+                            >
+                                <ArrowDropUp fontSize="inherit" />
+                                <ArrowDropDown fontSize="inherit" />
+                            </motion.div>} />
+                    </Divider>
+                    <AnimatePresence>
+                        {player.relatedTracks && showDetails &&
+                            <motion.div
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '.4rem',
+                                    width: '100%',
+                                    overflow: 'hidden',
+                                }}
+                                initial={{
+                                    height: 0,
+                                }}
+                                animate={{
+                                    height: 'auto',
+                                }}
+                                exit={{
+                                    height: 0,
+                                }}
+                            >
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'flex-start',
+                                    alignItems: 'center',
+                                    marginBottom: '.5rem',
+                                    padding: '.25rem',
+                                    gap: '.5rem',
+                                    borderRadius: '1.25rem',
+                                    backgroundColor: 'rgba(255,255,255,.05)',
+                                }}>
+                                    <SelectableChip onClick={() => {
+                                        player.setRelationProfile("track")
+                                    }} selected={
+                                        player.relationProfile === "track"
+                                    } label={<>
+                                        <Favorite fontSize="inherit" />
+                                        <span>For You</span>
+                                    </>} />
+                                    <SelectableChip onClick={() => {
+                                        player.setRelationProfile("artist")
+                                    }} selected={
+                                        player.relationProfile === "artist"
+                                    } label={<>
+                                        <Mic fontSize="inherit" />
+                                        <span>More from {player.currentSong.artist}</span>
+                                    </>} />
+                                </Box>
+                                {player.relatedTracks.map((song) => <PlayableSong key={song.spotify_id} song={song} />)}
+                            </motion.div>}
+                    </AnimatePresence>
                 </Box>
             }
-        </Container>
+        </Container >
     </>)
 }
 

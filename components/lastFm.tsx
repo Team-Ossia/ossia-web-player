@@ -7,6 +7,7 @@ export type Song = {
     name: string,
     artist: string,
     spotify_id: string,
+    spotify_artist_id: string,
 }
 
 const spaceRegex = /[\.\-\_\w]+/gi
@@ -28,7 +29,8 @@ export const querySongs = async (query: string, ac?: AbortController) => {
     // get spotify id for each song, if not found, remove it
     data.results.trackmatches.track = (await Promise.all(data.results.trackmatches.track.map((song: Song) => {
         return getTrackSpotifyId(song.artist, song.name, ac).then((id) => {
-            song.spotify_id = id;
+            song.spotify_id = id.track;
+            song.spotify_artist_id = id.artist;
             return song;
         }).catch(() => null);
     }))).filter((song: Song | null) => song !== null);
