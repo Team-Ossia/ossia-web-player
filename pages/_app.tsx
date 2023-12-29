@@ -585,103 +585,112 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [musicPlayer])
 
   return (<>
-    <MusicPlayerGlobal />
-    <CookiesHandler />
-    <div
-      style={{
-        display: 'none',
-      }}
-    >
-      <h1>Ossia | Music at your fingertips</h1>
-      <h2>A free alternative to music streaming, Ossia adapts to the music and your environment</h2>
-    </div>
-    <WeatherContext.Provider value={weather}>
-      <MusicPlayerContext.Provider value={musicPlayer as any}>
-        <div style={{
-          pointerEvents: 'none',
-          zIndex: -1,
-          position: 'fixed',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          overflow: 'hidden',
-        }} className="filters">
-          <WeatherEffects />
-          <SongBG />
-          <ArtworkWaves />
-        </div>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
+    <Box sx={{
+      // no visible scrollbar on phone
+      ...(!isMobile ? {} : {
+        '::-webkit-scrollbar': {
+          display: 'none',
+        }
+      })
+    }}>
+      <MusicPlayerGlobal />
+      <CookiesHandler />
+      <div
+        style={{
+          display: 'none',
+        }}
+      >
+        <h1>Ossia | Music at your fingertips</h1>
+        <h2>A free alternative to music streaming, Ossia adapts to the music and your environment</h2>
+      </div>
+      <WeatherContext.Provider value={weather}>
+        <MusicPlayerContext.Provider value={musicPlayer as any}>
           <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: dvh(100),
-            gap: 0,
-            justifyContent: 'space-between',
-          }}>
-            <div className='scroll-y'>
-              <Container sx={{
-                marginBottom: '1rem',
-                marginTop: '1rem',
-                position: 'relative',
-              }}>
-                <AnimatePresence mode='wait'>
-                  <motion.div key={router.route}
-                    onAnimationStart={() => {
-                      const styleElem = document.createElement('style')
-                      styleElem.setAttribute('id', 'page-transition')
-                      //hide all scrollbars 
-                      styleElem.innerHTML = `
+            pointerEvents: 'none',
+            zIndex: -1,
+            position: 'fixed',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            overflow: 'hidden',
+          }} className="filters">
+            <WeatherEffects />
+            <SongBG />
+            <ArtworkWaves />
+          </div>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              height: dvh(100),
+              gap: 0,
+              justifyContent: 'space-between',
+            }}>
+              <div className='scroll-y'>
+                <Container sx={{
+                  marginBottom: '1rem',
+                  marginTop: '1rem',
+                  position: 'relative',
+                }}>
+                  <AnimatePresence mode='wait'>
+                    <motion.div key={router.route}
+                      onAnimationStart={() => {
+                        const styleElem = document.createElement('style')
+                        styleElem.setAttribute('id', 'page-transition')
+                        //hide all scrollbars 
+                        styleElem.innerHTML = `
                   *::-webkit-scrollbar {
                     display: none;
                   }
                   `
-                      document.head.appendChild(styleElem)
-                    }}
-                    onAnimationComplete={() => {
-                      setTimeout(() => {
-                        const styleElem = document.getElementById('page-transition')
-                        if (styleElem) {
-                          styleElem.remove()
-                        }
-                      }, 100)
-                    }}
-                    style={{ overflow: 'hidden' }}
-                    transition={{ duration: .3, type: 'keyframes' }}
-                    initial={{ transform: 'translateX(100%)' }}
-                    animate={{
-                      transform: 'translateX(0%)',
-                      paddingBottom: (musicPlayer.currentSong && !router.pathname.startsWith("/player")) ? 'calc(var(--bottom-nav-height) * 1.5)' : '0',
-                      marginBottom: isMobile ? 'calc(var(--bottom-nav-height) + 1rem)' : '0',
-                    }}
-                    exit={{ transform: 'translateX(-100%)' }}
-                  >
-                    <Component {...pageProps} />
-                  </motion.div>
-                </AnimatePresence>
-              </Container>
+                        document.head.appendChild(styleElem)
+                      }}
+                      onAnimationComplete={() => {
+                        setTimeout(() => {
+                          const styleElem = document.getElementById('page-transition')
+                          if (styleElem) {
+                            styleElem.remove()
+                          }
+                        }, 100)
+                      }}
+                      style={{ overflow: 'hidden' }}
+                      transition={{ duration: .3, type: 'keyframes' }}
+                      initial={{ transform: 'translateX(100%)' }}
+                      animate={{
+                        transform: 'translateX(0%)',
+                        paddingBottom: (musicPlayer.currentSong && !router.pathname.startsWith("/player")) ? 'calc(var(--bottom-nav-height) * 1.5)' : '0',
+                        marginBottom: isMobile ? 'calc(var(--bottom-nav-height) + 1rem)' : '0',
+                      }}
+                      exit={{ transform: 'translateX(-100%)' }}
+                    >
+                      <Component {...pageProps} />
+                    </motion.div>
+                  </AnimatePresence>
+                </Container>
+              </div>
+              <PiPProvider>
+                <PiPInner />
+              </PiPProvider>
+              <NowPlayingWidgetBottom />
+              <PhoneNavbar />
+              <Box sx={{
+                position: 'fixed',
+                top: 0,
+                right: 0,
+                zIndex: 999999,
+              }}>
+              </Box>
+              <div id="pipfix" style={{
+                display: 'none',
+              }}>
+                <QuickMenuInner />
+              </div>
             </div>
-            <PiPProvider>
-              <PiPInner />
-            </PiPProvider>
-            <NowPlayingWidgetBottom />
-            <PhoneNavbar />
-            <Box sx={{
-              position: 'fixed',
-              top: 0,
-              right: 0,
-              zIndex: 999999,
-            }}>
-            </Box>
-            <div id="pipfix" style={{
-              display: 'none',
-            }}>
-              <QuickMenuInner />
-            </div>
-          </div>
-        </ThemeProvider>
-      </MusicPlayerContext.Provider>
-    </WeatherContext.Provider>
+          </ThemeProvider>
+        </MusicPlayerContext.Provider>
+      </WeatherContext.Provider>
+    </Box>
   </>)
 }
